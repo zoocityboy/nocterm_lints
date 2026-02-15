@@ -4,7 +4,6 @@
 // See LICENSE file for details.
 
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
-import 'package:analyzer/dart/ast/ast.dart';
 import '../services/correction/assist.dart';
 import '../utilities/extensions/nocterm.dart';
 import 'package:analyzer_plugin/utilities/assist/assist.dart';
@@ -44,7 +43,7 @@ class NoctermWrapExpanded extends ResolvedCorrectionProducer {
     }
 
     await builder.addDartFileEdit(file, (builder) {
-      var eol = builder.eol;
+      // var eol = builder.eol;
       builder.addReplacement(range.node(widgetExpr), (builder) {
         builder.writeReference(parentClassElement);
         builder.write('(child: ');

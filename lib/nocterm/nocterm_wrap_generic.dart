@@ -4,7 +4,6 @@
 // See LICENSE file for details.
 
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
-import 'package:analyzer/dart/ast/ast.dart';
 import '../services/correction/assist.dart';
 import '../utilities/extensions/nocterm.dart';
 import 'package:analyzer_plugin/utilities/assist/assist.dart';
