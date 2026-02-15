@@ -1,3 +1,7 @@
+# 0.2.0-dev.2
+
+- **chore**: typo
+
 # 0.2.0-dev.1
 
 ## Features
