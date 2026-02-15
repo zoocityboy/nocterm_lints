@@ -24,7 +24,7 @@ abstract final class DartAssistKind {
   static const noctermWrapGeneric = AssistKind(
     'dart.assist.nocterm.wrap.generic',
     DartAssistKindPriority.noctermWrapGeneral,
-    'Wrap with widget...',
+    'Wrap with component...',
   );
   static const noctermWrapBuilder = AssistKind(
     'dart.assist.nocterm.wrap.builder',
@@ -72,11 +72,7 @@ abstract final class DartAssistKind {
     DartAssistKindPriority.noctermWrapSpecific,
     'Wrap with SizedBox',
   );
-  static const flutterWrapStreamBuilder = AssistKind(
-    'dart.assist.nocterm.wrap.streamBuilder',
-    DartAssistKindPriority.noctermWrapSpecific,
-    'Wrap with StreamBuilder',
-  );
+
   static const noctermWrapValueListenableBuilder = AssistKind(
     'dart.assist.nocterm.wrap.valueListenableBuilder',
     DartAssistKindPriority.noctermWrapSpecific,
