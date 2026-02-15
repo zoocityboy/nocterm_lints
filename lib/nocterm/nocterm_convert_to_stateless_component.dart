@@ -18,6 +18,7 @@ import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dar
 import 'package:analyzer_plugin/utilities/range_factory.dart';
 import 'package:nocterm_lints/services/correction/assist.dart';
 import '../utilities/extensions/ast.dart';
+import '../utilities/extensions/session_helper.dart';
 
 class NoctermConvertToStatelessWidget extends ResolvedCorrectionProducer {
   NoctermConvertToStatelessWidget({required super.context});
@@ -144,16 +145,16 @@ class NoctermConvertToStatelessWidget extends ResolvedCorrectionProducer {
       return SourceEdit.applySequence(text, visitor.edits.reversed.toList());
     }
 
-    var statelessWidgetClass = await sessionHelper.getFlutterClass(
-      'StatelessWidget',
+    var statelessComponentClass = await sessionHelper.getNoctermClass(
+      'StatelessComponent',
     );
-    if (statelessWidgetClass == null) {
+    if (statelessComponentClass == null) {
       return;
     }
 
     await builder.addDartFileEdit(file, (builder) {
       builder.addReplacement(range.node(superclass), (builder) {
-        builder.writeReference(statelessWidgetClass);
+        builder.writeReference(statelessComponentClass);
       });
 
       builder.addDeletion(range.deletionRange(stateClass));

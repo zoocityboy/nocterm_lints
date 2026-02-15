@@ -1,7 +1,7 @@
 import 'package:analysis_server_plugin/plugin.dart';
 import 'package:analysis_server_plugin/registry.dart';
-import 'package:nocterm_lints/nocterm/nocterm_convert_to_stateful_widget.dart';
-import 'nocterm/nocterm_convert_to_stateless_widget.dart';
+import 'package:nocterm_lints/nocterm/nocterm_convert_to_stateful_component.dart';
+import 'nocterm/nocterm_convert_to_stateless_component.dart';
 import 'nocterm/nocterm_move_down.dart';
 import 'nocterm/nocterm_move_up.dart';
 import 'nocterm/nocterm_remove_widget.dart';

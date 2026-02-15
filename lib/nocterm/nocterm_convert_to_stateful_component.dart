@@ -18,6 +18,7 @@ import 'package:analyzer_plugin/utilities/range_factory.dart';
 import '../../utilities/extensions/nocterm.dart';
 import '../services/correction/assist.dart';
 import '../utilities/extensions/ast.dart';
+import '../utilities/extensions/session_helper.dart';
 
 class NoctermConvertToStatefulWidget extends ResolvedCorrectionProducer {
   NoctermConvertToStatefulWidget({required super.context});
@@ -31,39 +32,39 @@ class NoctermConvertToStatefulWidget extends ResolvedCorrectionProducer {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
-    var widgetClass = node.thisOrAncestorOfType<ClassDeclaration>();
-    var superclass = widgetClass?.extendsClause?.superclass;
-    if (widgetClass == null || superclass == null) {
+    var componentClass = node.thisOrAncestorOfType<ClassDeclaration>();
+    var superclass = componentClass?.extendsClause?.superclass;
+    if (componentClass == null || superclass == null) {
       return;
     }
 
-    var body = widgetClass.body;
+    var body = componentClass.body;
     if (body is! BlockClassBody) {
       return;
     }
 
     // Don't spam, activate only from the `class` keyword to the class body.
-    if (selectionOffset < widgetClass.classKeyword.offset ||
+    if (selectionOffset < componentClass.classKeyword.offset ||
         selectionOffset > body.leftBracket.end) {
       return;
     }
 
     // Must be a StatelessWidget subclass.
-    var widgetClassElement = widgetClass.declaredFragment!.element;
-    var superType = widgetClassElement.supertype;
+    var componentClassElement = componentClass.declaredFragment!.element;
+    var superType = componentClassElement.supertype;
     if (superType == null || !superType.isExactlyStatelessComponentType) {
       return;
     }
 
-    var buildMethod = _findBuildMethod(widgetClass);
+    var buildMethod = _findBuildMethod(componentClass);
     if (buildMethod == null) {
       return;
     }
 
-    var widgetName = widgetClassElement.displayName;
-    var stateName = widgetClassElement.isPrivate
-        ? '${widgetName}State'
-        : '_${widgetName}State';
+    var componentName = componentClassElement.displayName;
+    var stateName = componentClassElement.isPrivate
+        ? '${componentName}State'
+        : '_${componentName}State';
 
     // Find fields assigned in constructors.
     var visitor = _FieldFinder();
@@ -113,7 +114,7 @@ class NoctermConvertToStatefulWidget extends ResolvedCorrectionProducer {
 
       // Insert `widget.` before references to the widget instance members.
       var visitor = _ReplacementEditBuilder(
-        widgetClassElement,
+        componentClassElement,
         elementsToMove,
         linesRange,
       );
@@ -121,24 +122,24 @@ class NoctermConvertToStatefulWidget extends ResolvedCorrectionProducer {
       return SourceEdit.applySequence(text, visitor.edits.reversed.toList());
     }
 
-    var statefulWidgetClass = await sessionHelper.getFlutterClass(
-      'StatefulWidget',
+    var statefulComponentClass = await sessionHelper.getNoctermClass(
+      'StatefulComponent',
     );
-    var stateClass = await sessionHelper.getFlutterClass('State');
-    if (statefulWidgetClass == null || stateClass == null) {
+    var stateClass = await sessionHelper.getNoctermClass('State');
+    if (statefulComponentClass == null || stateClass == null) {
       return;
     }
 
     await builder.addDartFileEdit(file, (builder) {
       builder.addReplacement(range.node(superclass), (builder) {
-        builder.writeReference(statefulWidgetClass);
+        builder.writeReference(statefulComponentClass);
       });
 
       var replaceOffset = 0;
       var hasBuildMethod = false;
 
       var typeParams = '';
-      var typeParameters = widgetClass.namePart.typeParameters;
+      var typeParameters = componentClass.namePart.typeParameters;
       if (typeParameters != null) {
         typeParams = utils.getNodeText(typeParameters);
       }
@@ -163,7 +164,7 @@ class NoctermConvertToStatefulWidget extends ResolvedCorrectionProducer {
             builder.write('  ');
             builder.writeReference(stateClass);
             builder.write(
-              '<${widgetClass.namePart.typeName.lexeme}$typeParams>',
+              '<${componentClass.namePart.typeName.lexeme}$typeParams>',
             );
             builder.writeln(' createState() => $stateName$typeParams();');
             if (hasEmptyLineAfterCreateState) {
@@ -218,7 +219,7 @@ class NoctermConvertToStatefulWidget extends ResolvedCorrectionProducer {
       }
 
       // Create the State subclass.
-      builder.addInsertion(widgetClass.end, (builder) {
+      builder.addInsertion(componentClass.end, (builder) {
         builder.writeln();
         builder.writeln();
 
@@ -226,7 +227,7 @@ class NoctermConvertToStatefulWidget extends ResolvedCorrectionProducer {
         builder.writeReference(stateClass);
 
         // Write just param names (and not bounds, metadata and docs).
-        builder.write('<${widgetClass.namePart.typeName.lexeme}');
+        builder.write('<${componentClass.namePart.typeName.lexeme}');
         if (typeParameters != null) {
           builder.write('<');
           var first = true;
@@ -316,7 +317,7 @@ class _FieldFinder extends RecursiveAstVisitor<void> {
 }
 
 class _ReplacementEditBuilder extends RecursiveAstVisitor<void> {
-  final ClassElement widgetClassElement;
+  final ClassElement componentClassElement;
 
   final Set<Element> elementsToMove;
 
@@ -325,7 +326,7 @@ class _ReplacementEditBuilder extends RecursiveAstVisitor<void> {
   List<SourceEdit> edits = [];
 
   _ReplacementEditBuilder(
-    this.widgetClassElement,
+    this.componentClassElement,
     this.elementsToMove,
     this.linesRange,
   );
@@ -337,12 +338,12 @@ class _ReplacementEditBuilder extends RecursiveAstVisitor<void> {
     }
     var element = node.element;
     if (element is ExecutableElement &&
-        element.enclosingElement == widgetClassElement &&
+        element.enclosingElement == componentClassElement &&
         !elementsToMove.contains(element)) {
       var offset = node.offset - linesRange.offset;
       var qualifier = element.isStatic
-          ? widgetClassElement.displayName
-          : 'widget';
+          ? componentClassElement.displayName
+          : 'component';
 
       var parent = node.parent;
       if (parent is InterpolationExpression &&
