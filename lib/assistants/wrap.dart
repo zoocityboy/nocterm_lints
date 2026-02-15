@@ -340,7 +340,6 @@ abstract class _WrapMultipleWidgets extends ResolvedCorrectionProducer {
 
   @override
   CorrectionApplicability get applicability =>
-      // TODO(applicability): comment on why.
       CorrectionApplicability.singleLocation;
 
   String get _parentClassName;
@@ -400,7 +399,6 @@ abstract class _WrapSingleWidget extends ResolvedCorrectionProducer {
 
   @override
   CorrectionApplicability get applicability =>
-      // TODO(applicability): comment on why.
       CorrectionApplicability.singleLocation;
 
   List<String> get _leadingLines => const [];

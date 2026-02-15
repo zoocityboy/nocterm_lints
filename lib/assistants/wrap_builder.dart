@@ -29,7 +29,6 @@ abstract class _BaseWrapBuilder extends ResolvedCorrectionProducer {
 
   @override
   CorrectionApplicability get applicability =>
-      // TODO(applicability): comment on why.
       CorrectionApplicability.singleLocation;
 
   bool canWrapOn(TypeImpl typeOrThrow) {

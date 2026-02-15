@@ -31,7 +31,6 @@
 //       expect(SwapWithParent, isNotNull);
 //     });
 
-//     // TODO: Add integration tests using analyzer_testing framework
 //     // See .github/instructions/analysis-server-plugin.instructions.md
 //     // for testing guidelines using AnalysisRuleTest and test_reflective_loader
 //   });

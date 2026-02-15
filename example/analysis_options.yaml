@@ -1,4 +1,3 @@
-# include: package:nocterm_lints/recommended.yaml
 include: package:nocterm_lints/recommended.yaml
 plugins:
   nocterm_lints: 

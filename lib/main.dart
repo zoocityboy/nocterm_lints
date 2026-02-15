@@ -1,24 +1,24 @@
 import 'package:analysis_server_plugin/plugin.dart';
 import 'package:analysis_server_plugin/registry.dart';
 
-import 'src/assistants/convert_to_stateful_component.dart';
-import 'src/assistants/convert_to_stateless_component.dart';
-import 'src/assistants/move_down.dart';
-import 'src/assistants/move_up.dart';
-import 'src/assistants/remove_widget.dart';
-import 'src/assistants/swap_with_child.dart';
-import 'src/assistants/swap_with_parent.dart';
-import 'src/assistants/wrap_builder.dart';
-import 'src/assistants/wrap_center.dart';
-import 'src/assistants/wrap_column.dart';
-import 'src/assistants/wrap_component.dart';
-import 'src/assistants/wrap_container.dart';
-import 'src/assistants/wrap_expanded.dart';
-import 'src/assistants/wrap_flexible.dart';
-import 'src/assistants/wrap_generic.dart';
-import 'src/assistants/wrap_padding.dart';
-import 'src/assistants/wrap_row.dart';
-import 'src/assistants/wrap_sized_box.dart';
+import 'assistants/convert_to_stateful_component.dart';
+import 'assistants/convert_to_stateless_component.dart';
+import 'assistants/move_down.dart';
+import 'assistants/move_up.dart';
+import 'assistants/remove_widget.dart';
+import 'assistants/swap_with_child.dart';
+import 'assistants/swap_with_parent.dart';
+import 'assistants/wrap_builder.dart';
+import 'assistants/wrap_center.dart';
+import 'assistants/wrap_column.dart';
+import 'assistants/wrap_component.dart';
+import 'assistants/wrap_container.dart';
+import 'assistants/wrap_expanded.dart';
+import 'assistants/wrap_flexible.dart';
+import 'assistants/wrap_generic.dart';
+import 'assistants/wrap_padding.dart';
+import 'assistants/wrap_row.dart';
+import 'assistants/wrap_sized_box.dart';
 
 final plugin = NoctermLintsPlugin();
 
@@ -53,7 +53,7 @@ class NoctermLintsPlugin extends Plugin {
     registry.registerAssist(WrapValueListenableBuilder.new);
 
     /// Widget conversion assists
-    registry.registerAssist(ConvertToStatefulWidget.new);
-    registry.registerAssist(ConvertToStatelessWidget.new);
+    // registry.registerAssist(ConvertToStatefulWidget.new);
+    // registry.registerAssist(ConvertToStatelessWidget.new);
   }
 }
