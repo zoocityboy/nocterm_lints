@@ -31,3 +31,6 @@ analyzer:
     missing_required_param: error
     missing_return: error
     parameter_assignments: error     
+
+plugins:
+  nocterm_lints:

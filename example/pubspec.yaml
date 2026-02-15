@@ -6,8 +6,7 @@ environment:
 
 dependencies:
   nocterm: ^0.5.1
-  # no runtime dependencies
 
 dev_dependencies:
   nocterm_lints: 
-    path: ..
+    path: ../
