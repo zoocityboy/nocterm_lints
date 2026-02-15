@@ -11,12 +11,12 @@ abstract final class DartAssistKind {
     DartAssistKindPriority.default_,
     'Convert to children:',
   );
-  static const flutterConvertToStatefulWidget = AssistKind(
+  static const noctermConvertToStatefulWidget = AssistKind(
     'dart.assist.nocterm.convert.toStatefulComponent',
     DartAssistKindPriority.default_,
     'Convert to StatefulComponent',
   );
-  static const flutterConvertToStatelessWidget = AssistKind(
+  static const noctermConvertToStatelessWidget = AssistKind(
     'dart.assist.nocterm.convert.toStatelessComponent',
     DartAssistKindPriority.default_,
     'Convert to StatelessComponent',
