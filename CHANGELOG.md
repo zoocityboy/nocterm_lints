@@ -1,3 +1,26 @@
+# 0.3.0+beta.2
+
+- **refactor**: removed `Nocterm` prefix from assistant filenames and exported class names
+  - Renamed assistant files under `lib/src/assistants/` to drop the `nocterm_` prefix (for example
+    `nocterm_wrap_center.dart` → `wrap_center.dart`).
+  - Updated exported class names accordingly (for example `NoctermWrapCenter` → `WrapCenter`).
+  - Updated `lib/main.dart` to import and register the new class names.
+
+- **chore**: remove legacy files
+  - Deleted legacy `nocterm_*` assistant files after creating the renamed replacements.
+
+- **feature**: added/adjusted assists
+  - Added `remove_widget.dart` (`RemoveWidget`) and other per-assist producer files as part of the wrap refactor.
+
+- **docs**: README and acknowledgments updated
+  - Updated `README.md` project structure and usage examples to reference the new filenames.
+  - Updated `ACKNOWLEDGMENTS.md` to reflect renamed assists and provide attribution.
+
+- **notes / migration**:
+  - If you depend on the old `nocterm_*` filenames or the exported `Nocterm*` class names, update imports to the new paths and identifiers.
+  - Run `dart analyze` and `dart test` locally; after the mass rename some environment-specific imports or plugin AOT compilation may need minor fixes.
+
+
 # 0.3.0+beta.1
   
 - **chore**: wrong format of tag versions
