@@ -174,10 +174,10 @@ dart analyze
 nocterm_lints/
 ├── lib/
 │   ├── main.dart                 # Plugin entry point
-│   ├── nocterm/                  # Individual assists
-│   │   ├── nocterm_wrap_*.dart
-│   │   ├── nocterm_move_*.dart
-│   │   ├── nocterm_convert_*.dart
+│   ├── src/assistants/            # Individual assists
+│   │   ├── wrap_*.dart
+│   │   ├── move_*.dart
+│   │   ├── convert_*.dart
 │   │   └── ...
 │   ├── services/                 # Core services
 │   └── utilities/                # Shared extensions

@@ -1,23 +1,23 @@
 import 'package:analysis_server_plugin/plugin.dart';
 import 'package:analysis_server_plugin/registry.dart';
-import 'package:nocterm_lints/nocterm/nocterm_convert_to_stateful_component.dart';
-import 'nocterm/nocterm_convert_to_stateless_component.dart';
-import 'nocterm/nocterm_move_down.dart';
-import 'nocterm/nocterm_move_up.dart';
-import 'nocterm/nocterm_remove_widget.dart';
-import 'nocterm/nocterm_swap_with_child.dart';
-import 'nocterm/nocterm_swap_with_parent.dart';
-import 'nocterm/nocterm_wrap_builder.dart';
-import 'nocterm/nocterm_wrap_column.dart';
-import 'nocterm/nocterm_wrap_component.dart';
-import 'nocterm/nocterm_wrap_center.dart';
-import 'nocterm/nocterm_wrap_container.dart';
-import 'nocterm/nocterm_wrap_expanded.dart';
-import 'nocterm/nocterm_wrap_flexible.dart';
-import 'nocterm/nocterm_wrap_generic.dart';
-import 'nocterm/nocterm_wrap_padding.dart';
-import 'nocterm/nocterm_wrap_row.dart';
-import 'nocterm/nocterm_wrap_sized_box.dart';
+import 'package:nocterm_lints/src/assistants/convert_to_stateful_component.dart';
+import 'src/assistants/convert_to_stateless_component.dart';
+import 'src/assistants/move_down.dart';
+import 'src/assistants/move_up.dart';
+import 'src/assistants/remove_widget.dart';
+import 'src/assistants/swap_with_child.dart';
+import 'src/assistants/swap_with_parent.dart';
+import 'src/assistants/wrap_builder.dart';
+import 'src/assistants/wrap_column.dart';
+import 'src/assistants/wrap_component.dart';
+import 'src/assistants/wrap_center.dart';
+import 'src/assistants/wrap_container.dart';
+import 'src/assistants/wrap_expanded.dart';
+import 'src/assistants/wrap_flexible.dart';
+import 'src/assistants/wrap_generic.dart';
+import 'src/assistants/wrap_padding.dart';
+import 'src/assistants/wrap_row.dart';
+import 'src/assistants/wrap_sized_box.dart';
 
 final plugin = NoctermLintsPlugin();
 
@@ -29,30 +29,30 @@ class NoctermLintsPlugin extends Plugin {
   @override
   void register(PluginRegistry registry) {
     /// Widget manipulation assists
-    registry.registerAssist(NoctermMoveDown.new);
-    registry.registerAssist(NoctermMoveUp.new);
-    registry.registerAssist(NoctermRemoveWidget.new);
-    registry.registerAssist(NoctermSwapWithChild.new);
-    registry.registerAssist(NoctermSwapWithParent.new);
+    registry.registerAssist(MoveDown.new);
+    registry.registerAssist(MoveUp.new);
+    registry.registerAssist(RemoveWidget.new);
+    registry.registerAssist(SwapWithChild.new);
+    registry.registerAssist(SwapWithParent.new);
 
     /// Component wrapping assists
-    registry.registerAssist(NoctermWrapComponent.new);
-    registry.registerAssist(NoctermWrapGeneric.new);
-    registry.registerAssist(NoctermWrapCenter.new);
-    registry.registerAssist(NoctermWrapContainer.new);
-    registry.registerAssist(NoctermWrapExpanded.new);
-    registry.registerAssist(NoctermWrapFlexible.new);
-    registry.registerAssist(NoctermWrapPadding.new);
-    registry.registerAssist(NoctermWrapSizedBox.new);
-    registry.registerAssist(NoctermWrapRow.new);
-    registry.registerAssist(NoctermWrapColumn.new);
+    registry.registerAssist(WrapComponent.new);
+    registry.registerAssist(WrapGeneric.new);
+    registry.registerAssist(WrapCenter.new);
+    registry.registerAssist(WrapContainer.new);
+    registry.registerAssist(WrapExpanded.new);
+    registry.registerAssist(WrapFlexible.new);
+    registry.registerAssist(WrapPadding.new);
+    registry.registerAssist(WrapSizedBox.new);
+    registry.registerAssist(WrapRow.new);
+    registry.registerAssist(WrapColumn.new);
 
     /// Builder wrap assists
-    registry.registerAssist(NoctermWrapBuilder.new);
-    registry.registerAssist(NoctermWrapValueListenableBuilder.new);
+    registry.registerAssist(WrapBuilder.new);
+    registry.registerAssist(WrapValueListenableBuilder.new);
 
     /// Widget conversion assists
-    registry.registerAssist(NoctermConvertToStatefulWidget.new);
-    registry.registerAssist(NoctermConvertToStatelessWidget.new);
+    registry.registerAssist(ConvertToStatefulWidget.new);
+    registry.registerAssist(ConvertToStatelessWidget.new);
   }
 }

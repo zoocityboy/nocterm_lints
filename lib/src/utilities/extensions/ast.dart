@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-3-Clause license.
 // See LICENSE file for details.
 
-import '../../src/services/correction/namespace.dart';
+import '../../services/correction/namespace.dart';
 import 'element.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';

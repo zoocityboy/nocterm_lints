@@ -14,12 +14,12 @@ import 'package:analyzer_plugin/utilities/range_factory.dart';
 
 import '../services/correction/assist.dart';
 
-abstract class _NoctermBaseWrapBuilder extends ResolvedCorrectionProducer {
+abstract class _BaseWrapBuilder extends ResolvedCorrectionProducer {
   final List<String> extraBuilderParams;
   final List<String> extraNamedParams;
   final String builderName;
 
-  _NoctermBaseWrapBuilder({
+  _BaseWrapBuilder({
     required super.context,
     required this.builderName,
     required this.extraNamedParams,
@@ -93,8 +93,8 @@ abstract class _NoctermBaseWrapBuilder extends ResolvedCorrectionProducer {
   }
 }
 
-class NoctermWrapBuilder extends _NoctermBaseWrapBuilder {
-  NoctermWrapBuilder({required super.context})
+class WrapBuilder extends _BaseWrapBuilder {
+  WrapBuilder({required super.context})
     : super(
         builderName: 'Builder',
         extraNamedParams: const [],
@@ -105,8 +105,8 @@ class NoctermWrapBuilder extends _NoctermBaseWrapBuilder {
   AssistKind get assistKind => DartAssistKind.noctermWrapBuilder;
 }
 
-class NoctermWrapValueListenableBuilder extends _NoctermBaseWrapBuilder {
-  NoctermWrapValueListenableBuilder({required super.context})
+class WrapValueListenableBuilder extends _BaseWrapBuilder {
+  WrapValueListenableBuilder({required super.context})
     : super(
         builderName: 'ValueListenableBuilder',
         extraNamedParams: const ['valueListenable'],

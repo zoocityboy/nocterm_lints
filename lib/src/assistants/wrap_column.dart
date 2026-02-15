@@ -13,16 +13,16 @@ import 'package:analyzer_plugin/utilities/assist/assist.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
 
-/// Wraps multiple components with Row.
-class NoctermWrapRow extends ResolvedCorrectionProducer {
-  NoctermWrapRow({required super.context});
+/// Wraps multiple components with Column.
+class WrapColumn extends ResolvedCorrectionProducer {
+  WrapColumn({required super.context});
 
   @override
   CorrectionApplicability get applicability =>
       CorrectionApplicability.singleLocation;
 
   @override
-  AssistKind get assistKind => DartAssistKind.noctermWrapRow;
+  AssistKind get assistKind => DartAssistKind.noctermWrapColumn;
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
@@ -40,7 +40,7 @@ class NoctermWrapRow extends ResolvedCorrectionProducer {
     var selectedRange = range.startEnd(firstWidget, lastWidget);
     var src = utils.getRangeText(selectedRange);
 
-    var parentClassElement = await sessionHelper.getClass(noctermUri, 'Row');
+    var parentClassElement = await sessionHelper.getClass(noctermUri, 'Column');
     if (parentClassElement == null) {
       return;
     }

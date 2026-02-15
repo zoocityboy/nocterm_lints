@@ -17,6 +17,7 @@ dependencies:
   analyzer: '>=8.0.0 <10.0.0'
   analyzer_plugin: ^0.13.8
   collection: ^1.19.1
+  nocterm: ^0.5.1
   path: ^1.9.1
 
 dev_dependencies:

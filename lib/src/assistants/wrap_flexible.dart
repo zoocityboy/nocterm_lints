@@ -10,16 +10,16 @@ import 'package:analyzer_plugin/utilities/assist/assist.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
 
-/// Wraps a component with Container.
-class NoctermWrapContainer extends ResolvedCorrectionProducer {
-  NoctermWrapContainer({required super.context});
+/// Wraps a component with Flexible (for flex contexts only).
+class WrapFlexible extends ResolvedCorrectionProducer {
+  WrapFlexible({required super.context});
 
   @override
   CorrectionApplicability get applicability =>
       CorrectionApplicability.singleLocation;
 
   @override
-  AssistKind get assistKind => DartAssistKind.noctermWrapContainer;
+  AssistKind get assistKind => DartAssistKind.noctermWrapFlexible;
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
@@ -29,14 +29,14 @@ class NoctermWrapContainer extends ResolvedCorrectionProducer {
     }
 
     var widgetType = widgetExpr.staticType;
-    if (widgetType == null || widgetType.isExactComponentTypeContainer) {
+    if (widgetType == null || widgetType.isExactComponentTypeFlexible) {
       return;
     }
 
     var widgetSrc = utils.getNodeText(widgetExpr);
     var parentClassElement = await sessionHelper.getClass(
       noctermUri,
-      'Container',
+      'Flexible',
     );
     if (parentClassElement == null) {
       return;

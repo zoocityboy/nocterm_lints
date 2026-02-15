@@ -12,8 +12,8 @@ import 'package:analyzer_plugin/utilities/assist/assist.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
 
-class NoctermWrapComponent extends ResolvedCorrectionProducer {
-  NoctermWrapComponent({required super.context});
+class WrapComponent extends ResolvedCorrectionProducer {
+  WrapComponent({required super.context});
 
   @override
   CorrectionApplicability get applicability =>

@@ -11,16 +11,17 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/source/source_range.dart';
 import 'package:analyzer/src/dart/ast/extensions.dart';
-import '../../utilities/extensions/nocterm.dart';
+import '../utilities/extensions/nocterm.dart';
 import 'package:analyzer_plugin/protocol/protocol_common.dart' hide Element;
 import 'package:analyzer_plugin/utilities/assist/assist.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
-import 'package:nocterm_lints/services/correction/assist.dart';
+import 'package:nocterm_lints/src/services/correction/assist.dart';
 import '../utilities/extensions/ast.dart';
+import '../utilities/extensions/session_helper.dart';
 
-class NoctermConvertToStatelessWidget extends ResolvedCorrectionProducer {
-  NoctermConvertToStatelessWidget({required super.context});
+class ConvertToStatelessWidget extends ResolvedCorrectionProducer {
+  ConvertToStatelessWidget({required super.context});
 
   @override
   CorrectionApplicability get applicability =>
@@ -144,16 +145,17 @@ class NoctermConvertToStatelessWidget extends ResolvedCorrectionProducer {
       return SourceEdit.applySequence(text, visitor.edits.reversed.toList());
     }
 
-    var statelessWidgetClass = await sessionHelper.getFlutterClass(
-      'StatelessWidget',
+    var statelessComponentClass = await getNoctermClass(
+      sessionHelper,
+      'StatelessComponent',
     );
-    if (statelessWidgetClass == null) {
+    if (statelessComponentClass == null) {
       return;
     }
 
     await builder.addDartFileEdit(file, (builder) {
       builder.addReplacement(range.node(superclass), (builder) {
-        builder.writeReference(statelessWidgetClass);
+        builder.writeReference(statelessComponentClass);
       });
 
       builder.addDeletion(range.deletionRange(stateClass));
@@ -398,7 +400,7 @@ class _StatelessVerifier extends RecursiveAstVisitor<void> {
     var classElement = methodElement?.enclosingElement;
     if (classElement is ClassElement &&
         classElement.isExactState &&
-        !NoctermConvertToStatelessWidget._isDefaultOverride(
+        !ConvertToStatelessWidget._isDefaultOverride(
           node.thisOrAncestorOfType<MethodDeclaration>(),
         )) {
       canBeStateless = false;
@@ -437,7 +439,7 @@ class _StateUsageVisitor extends RecursiveAstVisitor<void> {
     var type = node.staticType;
     if (type is InterfaceType &&
         node.methodName.name == 'createState' &&
-        (NoctermConvertToStatelessWidget._isState(widgetClassElement, type) ||
+        (ConvertToStatelessWidget._isState(widgetClassElement, type) ||
             type.element == stateClassElement)) {
       used = true;
     }

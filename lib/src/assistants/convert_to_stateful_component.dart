@@ -15,13 +15,13 @@ import 'package:analyzer_plugin/utilities/assist/assist.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
 
-import '../../utilities/extensions/nocterm.dart';
+import '../utilities/extensions/nocterm.dart';
 import '../services/correction/assist.dart';
 import '../utilities/extensions/ast.dart';
 import '../utilities/extensions/session_helper.dart';
 
-class NoctermConvertToStatefulWidget extends ResolvedCorrectionProducer {
-  NoctermConvertToStatefulWidget({required super.context});
+class ConvertToStatefulWidget extends ResolvedCorrectionProducer {
+  ConvertToStatefulWidget({required super.context});
 
   @override
   CorrectionApplicability get applicability =>
@@ -122,10 +122,11 @@ class NoctermConvertToStatefulWidget extends ResolvedCorrectionProducer {
       return SourceEdit.applySequence(text, visitor.edits.reversed.toList());
     }
 
-    var statefulComponentClass = await sessionHelper.getNoctermClass(
+    var statefulComponentClass = await getNoctermClass(
+      sessionHelper,
       'StatefulComponent',
     );
-    var stateClass = await sessionHelper.getNoctermClass('State');
+    var stateClass = await getNoctermClass(sessionHelper, 'State');
     if (statefulComponentClass == null || stateClass == null) {
       return;
     }

@@ -11,8 +11,8 @@ import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dar
 import 'package:analyzer_plugin/utilities/range_factory.dart';
 
 /// Wraps a component with Padding.
-class NoctermWrapPadding extends ResolvedCorrectionProducer {
-  NoctermWrapPadding({required super.context});
+class WrapPadding extends ResolvedCorrectionProducer {
+  WrapPadding({required super.context});
 
   @override
   CorrectionApplicability get applicability =>

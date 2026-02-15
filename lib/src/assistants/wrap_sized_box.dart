@@ -10,16 +10,16 @@ import 'package:analyzer_plugin/utilities/assist/assist.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
 
-/// Wraps a component with Expanded (for flex contexts only).
-class NoctermWrapExpanded extends ResolvedCorrectionProducer {
-  NoctermWrapExpanded({required super.context});
+/// Wraps a component with SizedBox.
+class WrapSizedBox extends ResolvedCorrectionProducer {
+  WrapSizedBox({required super.context});
 
   @override
   CorrectionApplicability get applicability =>
       CorrectionApplicability.singleLocation;
 
   @override
-  AssistKind get assistKind => DartAssistKind.noctermWrapExpanded;
+  AssistKind get assistKind => DartAssistKind.noctermWrapSizedBox;
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
@@ -29,14 +29,14 @@ class NoctermWrapExpanded extends ResolvedCorrectionProducer {
     }
 
     var widgetType = widgetExpr.staticType;
-    if (widgetType == null || widgetType.isExactComponentTypeExpanded) {
+    if (widgetType == null || widgetType.isExactComponentTypeSizedBox) {
       return;
     }
 
     var widgetSrc = utils.getNodeText(widgetExpr);
     var parentClassElement = await sessionHelper.getClass(
       noctermUri,
-      'Expanded',
+      'SizedBox',
     );
     if (parentClassElement == null) {
       return;

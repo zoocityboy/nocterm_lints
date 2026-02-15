@@ -15,8 +15,8 @@ import 'package:analyzer_plugin/utilities/range_factory.dart';
 
 import '../services/correction/assist.dart';
 
-class NoctermRemoveWidget extends ResolvedCorrectionProducer {
-  NoctermRemoveWidget({required super.context});
+class RemoveWidget extends ResolvedCorrectionProducer {
+  RemoveWidget({required super.context});
 
   @override
   CorrectionApplicability get applicability =>

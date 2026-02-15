@@ -12,10 +12,10 @@ import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dar
 import 'package:nocterm_lints/utilities/extensions/nocterm.dart';
 
 import '../services/correction/assist.dart';
-import 'nocterm_swap_with_child.dart';
+import 'swap_with_child.dart';
 
-class NoctermSwapWithParent extends NoctermParentAndChild {
-  NoctermSwapWithParent({required super.context});
+class SwapWithParent extends ParentAndChild {
+  SwapWithParent({required super.context});
 
   @override
   AssistKind get assistKind => DartAssistKind.noctermSwapWithParent;

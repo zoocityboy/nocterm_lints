@@ -21,8 +21,8 @@ import 'package:analyzer_plugin/utilities/range_factory.dart';
 /// This producer discovers eligible components and registers appropriate
 /// wrap assists (Center, Container, Padding, Row, Column, etc.) based on
 /// the component type and context.
-class NoctermWrap extends MultiCorrectionProducer {
-  NoctermWrap({required super.context});
+class Wrap extends MultiCorrectionProducer {
+  Wrap({required super.context});
 
   @override
   Future<List<ResolvedCorrectionProducer>> get producers async {
@@ -36,10 +36,7 @@ class NoctermWrap extends MultiCorrectionProducer {
       var widgetType = widgetExpr.typeOrThrow;
 
       // Always provide generic wrap option
-      _registerProducer(
-        producers,
-        NoctermWrapGeneric(widgetExpr, context: context),
-      );
+      _registerProducer(producers, WrapGeneric(widgetExpr, context: context));
 
       // Register single-widget wrapper assistants
       _registerSingleWidgetWrappers(producers, widgetExpr, widgetType);
@@ -62,52 +59,34 @@ class NoctermWrap extends MultiCorrectionProducer {
   ) {
     // Center wrap
     if (!widgetType.isExactComponentTypeCenter) {
-      _registerProducer(
-        producers,
-        NoctermWrapCenter(widgetExpr, context: context),
-      );
+      _registerProducer(producers, WrapCenter(widgetExpr, context: context));
     }
 
     // Container wrap
     if (!widgetType.isExactComponentTypeContainer) {
-      _registerProducer(
-        producers,
-        NoctermWrapContainer(widgetExpr, context: context),
-      );
+      _registerProducer(producers, WrapContainer(widgetExpr, context: context));
     }
 
     // Expanded wrap (flex context only)
     if (!widgetType.isExactComponentTypeExpanded &&
         (widgetExpr.isParentFlexWidget || !widgetExpr.isParentWidget)) {
-      _registerProducer(
-        producers,
-        NoctermWrapExpanded(widgetExpr, context: context),
-      );
+      _registerProducer(producers, WrapExpanded(widgetExpr, context: context));
     }
 
     // Flexible wrap (flex context only)
     if (!widgetType.isExactComponentTypeFlexible &&
         (widgetExpr.isParentFlexWidget || !widgetExpr.isParentWidget)) {
-      _registerProducer(
-        producers,
-        NoctermWrapFlexible(widgetExpr, context: context),
-      );
+      _registerProducer(producers, WrapFlexible(widgetExpr, context: context));
     }
 
     // Padding wrap
     if (!widgetType.isExactComponentTypePadding) {
-      _registerProducer(
-        producers,
-        NoctermWrapPadding(widgetExpr, context: context),
-      );
+      _registerProducer(producers, WrapPadding(widgetExpr, context: context));
     }
 
     // SizedBox wrap
     if (!widgetType.isExactComponentTypeSizedBox) {
-      _registerProducer(
-        producers,
-        NoctermWrapSizedBox(widgetExpr, context: context),
-      );
+      _registerProducer(producers, WrapSizedBox(widgetExpr, context: context));
     }
   }
 
@@ -129,11 +108,11 @@ class NoctermWrap extends MultiCorrectionProducer {
 
     _registerProducer(
       producers,
-      NoctermWrapColumn(firstWidget, lastWidget, context: context),
+      WrapColumn(firstWidget, lastWidget, context: context),
     );
     _registerProducer(
       producers,
-      NoctermWrapRow(firstWidget, lastWidget, context: context),
+      WrapRow(firstWidget, lastWidget, context: context),
     );
   }
 
@@ -197,28 +176,28 @@ class NoctermWrap extends MultiCorrectionProducer {
 // ============================================================================
 //
 // The following classes represent all wrap-based code assists registered
-// through NoctermWrap. Each assistant handles transforming Nocterm components
+// through Wrap. Each assistant handles transforming Nocterm components
 // by wrapping them with layout or spacing widgets.
 //
 // SINGLE-WIDGET WRAPPERS (applied to individual components):
-//   - NoctermWrapGeneric  : Wrap with generic 'component' placeholder
-//   - NoctermWrapCenter   : Wrap with Center alignment widget
-//   - NoctermWrapContainer: Wrap with Container decoration widget
-//   - NoctermWrapExpanded : Wrap with Expanded (flex only)
-//   - NoctermWrapFlexible : Wrap with Flexible (flex only)
-//   - NoctermWrapPadding  : Wrap with Padding edge insets
-//   - NoctermWrapSizedBox : Wrap with SizedBox size constraints
+//   - WrapGeneric  : Wrap with generic 'component' placeholder
+//   - WrapCenter   : Wrap with Center alignment widget
+//   - WrapContainer: Wrap with Container decoration widget
+//   - WrapExpanded : Wrap with Expanded (flex only)
+//   - WrapFlexible : Wrap with Flexible (flex only)
+//   - WrapPadding  : Wrap with Padding edge insets
+//   - WrapSizedBox : Wrap with SizedBox size constraints
 //
 // MULTI-WIDGET WRAPPERS (applied to multiple selected components):
-//   - NoctermWrapRow      : Wrap selection with Row (horizontal layout)
-//   - NoctermWrapColumn   : Wrap selection with Column (vertical layout)
+//   - WrapRow      : Wrap selection with Row (horizontal layout)
+//   - WrapColumn   : Wrap selection with Column (vertical layout)
 //
 // ============================================================================
 
 /// A correction processor that can make one of the possible changes computed by
-/// the [NoctermWrap] producer.
-class NoctermWrapCenter extends _WrapSingleWidget {
-  NoctermWrapCenter(super.widgetExpr, {required super.context});
+/// the [Wrap] producer.
+class WrapCenter extends _WrapSingleWidget {
+  WrapCenter(super.widgetExpr, {required super.context});
 
   @override
   AssistKind get assistKind => DartAssistKind.noctermWrapCenter;
@@ -231,13 +210,9 @@ class NoctermWrapCenter extends _WrapSingleWidget {
 }
 
 /// A correction processor that can make one of the possible changes computed by
-/// the [NoctermWrap] producer.
-class NoctermWrapColumn extends _WrapMultipleWidgets {
-  NoctermWrapColumn(
-    super.firstWidget,
-    super.lastWidget, {
-    required super.context,
-  });
+/// the [Wrap] producer.
+class WrapColumn extends _WrapMultipleWidgets {
+  WrapColumn(super.firstWidget, super.lastWidget, {required super.context});
 
   @override
   AssistKind get assistKind => DartAssistKind.noctermWrapColumn;
@@ -247,9 +222,9 @@ class NoctermWrapColumn extends _WrapMultipleWidgets {
 }
 
 /// A correction processor that can make one of the possible changes computed by
-/// the [NoctermWrap] producer.
-class NoctermWrapContainer extends _WrapSingleWidget {
-  NoctermWrapContainer(super.widgetExpr, {required super.context});
+/// the [Wrap] producer.
+class WrapContainer extends _WrapSingleWidget {
+  WrapContainer(super.widgetExpr, {required super.context});
 
   @override
   AssistKind get assistKind => DartAssistKind.noctermWrapContainer;
@@ -262,9 +237,9 @@ class NoctermWrapContainer extends _WrapSingleWidget {
 }
 
 /// A correction processor that can make one of the possible changes computed by
-/// the [NoctermWrap] producer.
-class NoctermWrapExpanded extends _WrapSingleWidget {
-  NoctermWrapExpanded(super.widgetExpr, {required super.context});
+/// the [Wrap] producer.
+class WrapExpanded extends _WrapSingleWidget {
+  WrapExpanded(super.widgetExpr, {required super.context});
 
   @override
   AssistKind get assistKind => DartAssistKind.noctermWrapExpanded;
@@ -277,9 +252,9 @@ class NoctermWrapExpanded extends _WrapSingleWidget {
 }
 
 /// A correction processor that can make one of the possible changes computed by
-/// the [NoctermWrap] producer.
-class NoctermWrapFlexible extends _WrapSingleWidget {
-  NoctermWrapFlexible(super.widgetExpr, {required super.context});
+/// the [Wrap] producer.
+class WrapFlexible extends _WrapSingleWidget {
+  WrapFlexible(super.widgetExpr, {required super.context});
 
   @override
   AssistKind get assistKind => DartAssistKind.noctermWrapFlexible;
@@ -292,18 +267,18 @@ class NoctermWrapFlexible extends _WrapSingleWidget {
 }
 
 /// A correction processor that can make one of the possible changes computed by
-/// the [NoctermWrap] producer.
-class NoctermWrapGeneric extends _WrapSingleWidget {
-  NoctermWrapGeneric(super.widgetExpr, {required super.context});
+/// the [Wrap] producer.
+class WrapGeneric extends _WrapSingleWidget {
+  WrapGeneric(super.widgetExpr, {required super.context});
 
   @override
   AssistKind get assistKind => DartAssistKind.noctermWrapGeneric;
 }
 
 /// A correction processor that can make one of the possible changes computed by
-/// the [NoctermWrap] producer.
-class NoctermWrapPadding extends _WrapSingleWidget {
-  NoctermWrapPadding(super.widgetExpr, {required super.context});
+/// the [Wrap] producer.
+class WrapPadding extends _WrapSingleWidget {
+  WrapPadding(super.widgetExpr, {required super.context});
 
   @override
   AssistKind get assistKind => DartAssistKind.noctermWrapPadding;
@@ -324,9 +299,9 @@ class NoctermWrapPadding extends _WrapSingleWidget {
 }
 
 /// A correction processor that can make one of the possible changes computed by
-/// the [NoctermWrap] producer.
-class NoctermWrapRow extends _WrapMultipleWidgets {
-  NoctermWrapRow(super.firstWidget, super.lastWidget, {required super.context});
+/// the [Wrap] producer.
+class WrapRow extends _WrapMultipleWidgets {
+  WrapRow(super.firstWidget, super.lastWidget, {required super.context});
 
   @override
   AssistKind get assistKind => DartAssistKind.noctermWrapRow;
@@ -336,9 +311,9 @@ class NoctermWrapRow extends _WrapMultipleWidgets {
 }
 
 /// A correction processor that can make one of the possible changes computed by
-/// the [NoctermWrap] producer.
-class NoctermWrapSizedBox extends _WrapSingleWidget {
-  NoctermWrapSizedBox(super.widgetExpr, {required super.context});
+/// the [Wrap] producer.
+class WrapSizedBox extends _WrapSingleWidget {
+  WrapSizedBox(super.widgetExpr, {required super.context});
 
   @override
   AssistKind get assistKind => DartAssistKind.noctermWrapSizedBox;
@@ -351,7 +326,7 @@ class NoctermWrapSizedBox extends _WrapSingleWidget {
 }
 
 /// A correction processor that can make one of the possible changes computed by
-/// the [NoctermWrap] producer.
+/// the [Wrap] producer.
 abstract class _WrapMultipleWidgets extends ResolvedCorrectionProducer {
   final Expression firstWidget;
 
@@ -418,7 +393,7 @@ abstract class _WrapMultipleWidgets extends ResolvedCorrectionProducer {
 }
 
 /// A correction processor that can make one of the possible changes computed by
-/// the [NoctermWrap] producer.
+/// the [Wrap] producer.
 abstract class _WrapSingleWidget extends ResolvedCorrectionProducer {
   final Expression widgetExpr;
 

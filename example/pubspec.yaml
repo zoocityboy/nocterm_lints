@@ -10,3 +10,4 @@ dependencies:
 dev_dependencies:
   nocterm_lints: 
     path: ../
+  lints: ^6.1.0

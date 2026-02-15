@@ -12,12 +12,11 @@ import 'package:nocterm_lints/utilities/extensions/nocterm.dart';
 
 import '../services/correction/assist.dart';
 
-abstract class NoctermParentAndChild extends ResolvedCorrectionProducer {
-  NoctermParentAndChild({required super.context});
+abstract class ParentAndChild extends ResolvedCorrectionProducer {
+  ParentAndChild({required super.context});
 
   @override
   CorrectionApplicability get applicability =>
-      // TODO(applicability): comment on why.
       CorrectionApplicability.singleLocation;
 
   Future<void> swapParentAndChild(
@@ -154,8 +153,8 @@ abstract class NoctermParentAndChild extends ResolvedCorrectionProducer {
   }
 }
 
-class NoctermSwapWithChild extends NoctermParentAndChild {
-  NoctermSwapWithChild({required super.context});
+class SwapWithChild extends ParentAndChild {
+  SwapWithChild({required super.context});
 
   @override
   AssistKind get assistKind => DartAssistKind.noctermSwapWithChild;

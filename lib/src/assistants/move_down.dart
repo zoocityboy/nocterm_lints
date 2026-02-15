@@ -13,8 +13,8 @@ import 'package:analyzer_plugin/utilities/range_factory.dart';
 import '../services/correction/assist.dart';
 import '../utilities/extensions/nocterm.dart';
 
-class NoctermMoveDown extends ResolvedCorrectionProducer {
-  NoctermMoveDown({required super.context});
+class MoveDown extends ResolvedCorrectionProducer {
+  MoveDown({required super.context});
 
   @override
   CorrectionApplicability get applicability =>

@@ -11,8 +11,8 @@ import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dar
 import 'package:analyzer_plugin/utilities/range_factory.dart';
 
 /// Wraps a component with Center.
-class NoctermWrapCenter extends ResolvedCorrectionProducer {
-  NoctermWrapCenter({required super.context});
+class WrapCenter extends ResolvedCorrectionProducer {
+  WrapCenter({required super.context});
 
   @override
   CorrectionApplicability get applicability =>

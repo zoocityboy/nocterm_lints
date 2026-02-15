@@ -7,15 +7,15 @@ This project was inspired by and contains code derived from the [Dart SDK](https
 The following files and functionality are derived from the Dart project and retain their BSD-3-Clause copyright:
 
 ### Assists (lib/nocterm/)
-- `nocterm_convert_to_stateless_widget.dart` - Derived from Dart's "convert to stateless widget" assist
-- `nocterm_convert_to_stateful_widget.dart` - Derived from Dart's "convert to stateful widget" assist
-- `nocterm_move_down.dart` - Derived from Dart's widget move-down assist
-- `nocterm_move_up.dart` - Derived from Dart's widget move-up assist
-- `nocterm_remove_widget.dart` - Derived from Dart's remove-widget assist
-- `nocterm_swap_with_child.dart` - Derived from Dart's swap with child assist
-- `nocterm_swap_with_parent.dart` - Derived from Dart's swap with parent assist
-- `nocterm_wrap_*.dart` (all wrap variants) - Derived from Dart's widget wrapping assists
-- `nocterm_wrap_component.dart` - Adapted wrapping logic for Nocterm components
+- `convert_to_stateless_component.dart` - Derived from Dart's "convert to stateless widget" assist
+- `convert_to_stateful_component.dart` - Derived from Dart's "convert to stateful widget" assist
+- `move_down.dart` - Derived from Dart's widget move-down assist
+- `move_up.dart` - Derived from Dart's widget move-up assist
+- `remove_widget.dart` - Derived from Dart's remove-widget assist
+- `swap_with_child.dart` - Derived from Dart's swap with child assist
+- `swap_with_parent.dart` - Derived from Dart's swap with parent assist
+- `wrap_*.dart` (all wrap variants) - Derived from Dart's widget wrapping assists
+- `wrap_component.dart` - Adapted wrapping logic for Nocterm components
 
 ### Extensions (lib/utilities/extensions/)
 - `ast.dart` - Derived from Dart's AST extension utilities
