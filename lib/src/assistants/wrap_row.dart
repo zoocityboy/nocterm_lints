@@ -5,13 +5,14 @@
 
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import '../services/correction/assist.dart';
-import '../services/correction/selection_analyzer.dart';
-import '../utilities/extensions/nocterm.dart';
 import 'package:analyzer/source/source_range.dart';
 import 'package:analyzer_plugin/utilities/assist/assist.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
+
+import '../services/correction/assist.dart';
+import '../services/correction/selection_analyzer.dart';
+import '../utilities/extensions/nocterm.dart';
 
 /// Wraps multiple components with Row.
 class WrapRow extends ResolvedCorrectionProducer {
@@ -26,21 +27,21 @@ class WrapRow extends ResolvedCorrectionProducer {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
-    var selectionRange = SourceRange(selectionOffset, selectionLength);
-    var analyzer = SelectionAnalyzer(selectionRange);
+    final selectionRange = SourceRange(selectionOffset, selectionLength);
+    final analyzer = SelectionAnalyzer(selectionRange);
     unitResult.unit.accept(analyzer);
 
-    var widgetExpressions = _extractSelectedWidgetExpressions(analyzer);
+    final widgetExpressions = _extractSelectedWidgetExpressions(analyzer);
     if (widgetExpressions.isEmpty) {
       return;
     }
 
-    var firstWidget = widgetExpressions.first;
-    var lastWidget = widgetExpressions.last;
-    var selectedRange = range.startEnd(firstWidget, lastWidget);
-    var src = utils.getRangeText(selectedRange);
+    final firstWidget = widgetExpressions.first;
+    final lastWidget = widgetExpressions.last;
+    final selectedRange = range.startEnd(firstWidget, lastWidget);
+    final src = utils.getRangeText(selectedRange);
 
-    var parentClassElement = await sessionHelper.getClass(noctermUri, 'Row');
+    final parentClassElement = await sessionHelper.getClass(noctermUri, 'Row');
     if (parentClassElement == null) {
       return;
     }
@@ -50,16 +51,16 @@ class WrapRow extends ResolvedCorrectionProducer {
         builder.writeReference(parentClassElement);
         builder.write('(');
 
-        var indentOld = utils.getLinePrefix(firstWidget.offset);
-        var indentNew1 = indentOld + utils.oneIndent;
-        var indentNew2 = indentOld + utils.twoIndents;
+        final indentOld = utils.getLinePrefix(firstWidget.offset);
+        final indentNew1 = indentOld + utils.oneIndent;
+        final indentNew2 = indentOld + utils.twoIndents;
 
         builder.writeln();
         builder.write(indentNew1);
         builder.write('children: [');
         builder.writeln();
 
-        var newSrc = utils.replaceSourceIndent(src, indentOld, indentNew2);
+        final newSrc = utils.replaceSourceIndent(src, indentOld, indentNew2);
         builder.write(indentNew2);
         builder.write(newSrc);
 
@@ -79,11 +80,11 @@ class WrapRow extends ResolvedCorrectionProducer {
   List<Expression> _extractSelectedWidgetExpressions(
     SelectionAnalyzer analyzer,
   ) {
-    var widgetExpressions = <Expression>[];
+    final widgetExpressions = <Expression>[];
 
     if (analyzer.hasSelectedNodes) {
       for (var selectedNode in analyzer.selectedNodes) {
-        var parent = selectedNode.parent;
+        final parent = selectedNode.parent;
         if (selectedNode is ConstructorName &&
             parent is InstanceCreationExpression) {
           selectedNode = parent;
@@ -102,7 +103,7 @@ class WrapRow extends ResolvedCorrectionProducer {
         coveringNode = coveringNode.parent;
       }
 
-      var widget = coveringNode.findComponentExpression;
+      final widget = coveringNode.findComponentExpression;
       if (widget != null) {
         widgetExpressions.add(widget);
       }

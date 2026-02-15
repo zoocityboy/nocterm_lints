@@ -2,29 +2,30 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+/// Assist that wraps a component with
+/// a builder (e.g. Builder, ValueListenableBuilder).
 // ignore_for_file: implementation_imports
 
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 import 'package:analyzer/src/dart/ast/extensions.dart';
 import 'package:analyzer/src/dart/element/type.dart';
-import '../utilities/extensions/nocterm.dart';
 import 'package:analyzer_plugin/utilities/assist/assist.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
 
 import '../services/correction/assist.dart';
+import '../utilities/extensions/nocterm.dart';
 
 abstract class _BaseWrapBuilder extends ResolvedCorrectionProducer {
-  final List<String> extraBuilderParams;
-  final List<String> extraNamedParams;
-  final String builderName;
-
   _BaseWrapBuilder({
     required super.context,
     required this.builderName,
     required this.extraNamedParams,
     required this.extraBuilderParams,
   });
+  final List<String> extraBuilderParams;
+  final List<String> extraNamedParams;
+  final String builderName;
 
   @override
   CorrectionApplicability get applicability =>
@@ -37,7 +38,7 @@ abstract class _BaseWrapBuilder extends ResolvedCorrectionProducer {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
-    var widgetExpr = node.findComponentExpression;
+    final widgetExpr = node.findComponentExpression;
     if (widgetExpr == null) {
       return;
     }
@@ -46,12 +47,12 @@ abstract class _BaseWrapBuilder extends ResolvedCorrectionProducer {
     }
     var widgetSrc = utils.getNodeText(widgetExpr);
 
-    var builderElement = await sessionHelper.getFlutterClass(builderName);
+    final builderElement = await sessionHelper.getFlutterClass(builderName);
     if (builderElement == null) {
       return;
     }
 
-    var params = ['context', ...extraBuilderParams];
+    final params = ['context', ...extraBuilderParams];
 
     await builder.addDartFileEdit(file, (builder) {
       builder.addReplacement(range.node(widgetExpr), (builder) {
@@ -59,11 +60,11 @@ abstract class _BaseWrapBuilder extends ResolvedCorrectionProducer {
 
         builder.writeln('(');
 
-        var indentOld = utils.getLinePrefix(widgetExpr.offset);
-        var indentNew1 = indentOld + utils.oneIndent;
-        var indentNew2 = indentOld + utils.twoIndents;
+        final indentOld = utils.getLinePrefix(widgetExpr.offset);
+        final indentNew1 = indentOld + utils.oneIndent;
+        final indentNew2 = indentOld + utils.twoIndents;
 
-        var namedParams = extraNamedParams.join(', ');
+        final namedParams = extraNamedParams.join(', ');
 
         if (namedParams.isNotEmpty) {
           builder.write(indentNew1);
@@ -81,7 +82,7 @@ abstract class _BaseWrapBuilder extends ResolvedCorrectionProducer {
         builder.writeln(';');
 
         builder.write(indentNew1);
-        var addTrailingCommas = getCodeStyleOptions(
+        final addTrailingCommas = getCodeStyleOptions(
           unitResult.file,
         ).addTrailingCommas;
         builder.writeln('}${addTrailingCommas ? "," : ""}');

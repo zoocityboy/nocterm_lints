@@ -8,12 +8,12 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/src/dart/ast/extensions.dart';
-import '../utilities/extensions/nocterm.dart';
 import 'package:analyzer_plugin/utilities/assist/assist.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
 
 import '../services/correction/assist.dart';
+import '../utilities/extensions/nocterm.dart';
 
 class RemoveWidget extends ResolvedCorrectionProducer {
   RemoveWidget({required super.context});
@@ -27,13 +27,13 @@ class RemoveWidget extends ResolvedCorrectionProducer {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
-    var widgetCreation = node.findInstanceCreationExpression;
+    final widgetCreation = node.findInstanceCreationExpression;
     if (widgetCreation == null || !widgetCreation.isComponentCreation) {
       return;
     }
 
-    if (widgetCreation.childrenArgument case var childrenArgument?) {
-      var childrenExpression = childrenArgument.expression;
+    if (widgetCreation.childrenArgument case final childrenArgument?) {
+      final childrenExpression = childrenArgument.expression;
       if (childrenExpression is ListLiteral &&
           childrenExpression.elements.isNotEmpty) {
         await _removeChildren(
@@ -42,12 +42,12 @@ class RemoveWidget extends ResolvedCorrectionProducer {
           childrenExpression.elements,
         );
       }
-    } else if (widgetCreation.childArgument case var childArgument?) {
+    } else if (widgetCreation.childArgument case final childArgument?) {
       await _removeSingle(builder, widgetCreation, childArgument.expression);
-    } else if (widgetCreation.builderArgument case var builderArgument?) {
+    } else if (widgetCreation.builderArgument case final builderArgument?) {
       await _removeBuilder(builder, widgetCreation, builderArgument);
-    } else if (widgetCreation.sliversArgument case var sliversArgument?) {
-      var sliversExpression = sliversArgument.expression;
+    } else if (widgetCreation.sliversArgument case final sliversArgument?) {
+      final sliversExpression = sliversArgument.expression;
       if (sliversExpression is ListLiteral &&
           sliversExpression.elements.isNotEmpty) {
         await _removeChildren(
@@ -56,7 +56,7 @@ class RemoveWidget extends ResolvedCorrectionProducer {
           sliversExpression.elements,
         );
       }
-    } else if (widgetCreation.sliverArgument case var sliverArgument?) {
+    } else if (widgetCreation.sliverArgument case final sliverArgument?) {
       await _removeSingle(builder, widgetCreation, sliverArgument.expression);
     } else {
       await _removeSingleWhenInList(builder, widgetCreation);
@@ -68,9 +68,9 @@ class RemoveWidget extends ResolvedCorrectionProducer {
     InstanceCreationExpression widgetCreation,
     NamedExpression builderArgument,
   ) async {
-    var builderExpression = builderArgument.expression;
+    final builderExpression = builderArgument.expression;
     if (builderExpression is! FunctionExpression) return;
-    var parameterElement = builderExpression
+    final parameterElement = builderExpression
         .parameters
         ?.parameters
         .firstOrNull
@@ -78,17 +78,17 @@ class RemoveWidget extends ResolvedCorrectionProducer {
         ?.element;
     if (parameterElement == null) return;
 
-    var visitor = _UsageFinder(parameterElement);
-    var body = builderExpression.body;
+    final visitor = _UsageFinder(parameterElement);
+    final body = builderExpression.body;
     body.visitChildren(visitor);
     if (visitor.used) return;
 
     if (body is BlockFunctionBody) {
-      var statements = body.block.statements;
+      final statements = body.block.statements;
       if (statements.length != 1) return;
-      var statement = statements.first;
+      final statement = statements.first;
       if (statement is! ReturnStatement) return;
-      var expression = statement.expression;
+      final expression = statement.expression;
       if (expression == null) return;
       await _removeSingle(builder, widgetCreation, expression);
     } else if (body is ExpressionFunctionBody) {
@@ -102,17 +102,17 @@ class RemoveWidget extends ResolvedCorrectionProducer {
     List<CollectionElement> childrenExpressions,
   ) async {
     // We can inline the list of our children only into another list.
-    var widgetParentNode = widgetCreation.parent;
+    final widgetParentNode = widgetCreation.parent;
     if (childrenExpressions.length > 1 && widgetParentNode is! ListLiteral) {
       return;
     }
 
     await builder.addDartFileEdit(file, (builder) {
-      var firstChild = childrenExpressions.first;
-      var lastChild = childrenExpressions.last;
+      final firstChild = childrenExpressions.first;
+      final lastChild = childrenExpressions.last;
       var childText = utils.getRangeText(range.startEnd(firstChild, lastChild));
-      var indentOld = utils.getLinePrefix(firstChild.offset);
-      var indentNew = utils.getLinePrefix(widgetCreation.offset);
+      final indentOld = utils.getLinePrefix(firstChild.offset);
+      final indentNew = utils.getLinePrefix(widgetCreation.offset);
       childText = utils.replaceSourceIndent(childText, indentOld, indentNew);
       builder.addSimpleReplacement(range.node(widgetCreation), childText);
     });
@@ -125,8 +125,8 @@ class RemoveWidget extends ResolvedCorrectionProducer {
   ) async {
     await builder.addDartFileEdit(file, (builder) {
       var childText = utils.getNodeText(expression);
-      var indentOld = utils.getLinePrefix(expression.offset);
-      var indentNew = utils.getLinePrefix(widgetCreation.offset);
+      final indentOld = utils.getLinePrefix(expression.offset);
+      final indentNew = utils.getLinePrefix(widgetCreation.offset);
       childText = utils.replaceSourceIndent(childText, indentOld, indentNew);
       builder.addSimpleReplacement(range.node(widgetCreation), childText);
     });
@@ -137,7 +137,7 @@ class RemoveWidget extends ResolvedCorrectionProducer {
     InstanceCreationExpression widgetCreation,
   ) async {
     // We can only remove the widget when this widget is in list.
-    var widgetParentNode = widgetCreation.parent;
+    final widgetParentNode = widgetCreation.parent;
     if (widgetParentNode is! ListLiteral) {
       return;
     }
@@ -151,10 +151,9 @@ class RemoveWidget extends ResolvedCorrectionProducer {
 }
 
 class _UsageFinder extends RecursiveAstVisitor<void> {
+  _UsageFinder(this.element);
   final Element element;
   bool used = false;
-
-  _UsageFinder(this.element);
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {

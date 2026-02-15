@@ -9,12 +9,11 @@ import 'package:analyzer_plugin/utilities/range_factory.dart';
 
 /// A visitor for visiting [AstNode]s covered by a selection [SourceRange].
 class SelectionAnalyzer extends GeneralizingAstVisitor<void> {
+  SelectionAnalyzer(this.selection);
   final SourceRange selection;
 
   AstNode? _coveringNode;
   List<AstNode> _selectedNodes = [];
-
-  SelectionAnalyzer(this.selection);
 
   /// Return the [AstNode] with the shortest length which completely covers the
   /// specified selection.
@@ -74,7 +73,7 @@ class SelectionAnalyzer extends GeneralizingAstVisitor<void> {
 
   @override
   void visitNode(AstNode node) {
-    var nodeRange = range.node(node);
+    final nodeRange = range.node(node);
     if (selection.covers(nodeRange)) {
       if (isFirstNode) {
         handleFirstSelectedNode(node);

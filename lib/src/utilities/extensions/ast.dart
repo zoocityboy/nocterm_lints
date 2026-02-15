@@ -3,8 +3,6 @@
 // Use of this source code is governed by a BSD-3-Clause license.
 // See LICENSE file for details.
 
-import '../../services/correction/namespace.dart';
-import 'element.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
@@ -17,11 +15,13 @@ import 'package:analyzer/src/utilities/extensions/ast.dart';
 import 'package:analyzer/src/utilities/extensions/collection.dart';
 import 'package:analyzer/src/utilities/extensions/element.dart';
 
+import '../../services/correction/namespace.dart';
+import 'element.dart';
+
 class ThrowStatement {
+  ThrowStatement({required this.statement, required this.expression});
   final ExpressionStatement statement;
   final ThrowExpression expression;
-
-  ThrowStatement({required this.statement, required this.expression});
 }
 
 class _ReferencedUnprefixedNamesCollector extends RecursiveAstVisitor<void> {
@@ -44,7 +44,7 @@ class _ReferencedUnprefixedNamesCollector extends RecursiveAstVisitor<void> {
   }
 
   @override
-  visitVariableDeclaration(VariableDeclaration node) {
+  void visitVariableDeclaration(VariableDeclaration node) {
     names.add(node.name.lexeme);
     return super.visitVariableDeclaration(node);
   }
@@ -54,7 +54,7 @@ class _ReferencedUnprefixedNamesCollector extends RecursiveAstVisitor<void> {
   }
 
   static bool _isPrefixed(SimpleIdentifier node) {
-    var parent = node.parent;
+    final parent = node.parent;
     return parent is ConstructorName && parent.name == node ||
         parent is MethodInvocation &&
             parent.methodName == node &&
@@ -67,7 +67,7 @@ class _ReferencedUnprefixedNamesCollector extends RecursiveAstVisitor<void> {
 extension AnnotatedNodeExtension on AnnotatedNode {
   /// Return the first token in this node that is not a comment.
   Token get firstNonCommentToken {
-    var metadata = this.metadata;
+    final metadata = this.metadata;
     if (metadata.isEmpty) {
       return firstTokenAfterCommentAndMetadata;
     }
@@ -78,7 +78,7 @@ extension AnnotatedNodeExtension on AnnotatedNode {
 extension AstNodeExtension on AstNode {
   /// Return the [IfStatement] associated with `this`.
   IfStatement? get enclosingIfStatement {
-    for (var node in withAncestors) {
+    for (final node in withAncestors) {
       if (node is IfStatement) {
         return node;
       } else if (node is! Expression) {
@@ -90,9 +90,9 @@ extension AstNodeExtension on AstNode {
 
   /// Return `true` if this node has an `override` annotation.
   bool get hasOverride {
-    var node = this;
+    final node = this;
     if (node is AnnotatedNode) {
-      for (var annotation in node.metadata) {
+      for (final annotation in node.metadata) {
         if (annotation.name.name == 'override' &&
             annotation.arguments == null) {
           return true;
@@ -103,12 +103,12 @@ extension AstNodeExtension on AstNode {
   }
 
   bool get inAsyncMethodOrFunction {
-    var body = thisOrAncestorOfType<FunctionBody>();
+    final body = thisOrAncestorOfType<FunctionBody>();
     return body != null && body.isAsynchronous && body.star == null;
   }
 
   bool get inAsyncStarOrSyncStarMethodOrFunction {
-    var body = thisOrAncestorOfType<FunctionBody>();
+    final body = thisOrAncestorOfType<FunctionBody>();
     return body != null && body.keyword != null && body.star != null;
   }
 
@@ -117,11 +117,11 @@ extension AstNodeExtension on AstNode {
   bool get inClassMemberBody {
     var node = this;
     while (true) {
-      var body = node.thisOrAncestorOfType<FunctionBody>();
+      final body = node.thisOrAncestorOfType<FunctionBody>();
       if (body == null) {
         return false;
       }
-      var parent = body.parent;
+      final parent = body.parent;
       if (parent is ConstructorDeclaration || parent is MethodDeclaration) {
         return true;
       } else if (parent == null) {
@@ -144,7 +144,7 @@ extension AstNodeExtension on AstNode {
 
   /// The [Token]s contained within `this`.
   List<Token> get tokens {
-    var result = <Token>[];
+    final result = <Token>[];
     for (var token = beginToken; ; token = token.next!) {
       result.add(token);
       if (token == endToken) {
@@ -157,9 +157,9 @@ extension AstNodeExtension on AstNode {
   /// Returns the [ExpressionStatement] associated with `this` if `this` points
   /// to the identifier for a simple `print`, and `null` otherwise.
   ExpressionStatement? findSimplePrintInvocation() {
-    var parent = this.parent;
-    var grandparent = parent?.parent;
-    if (this case SimpleIdentifier(:var element)) {
+    final parent = this.parent;
+    final grandparent = parent?.parent;
+    if (this case SimpleIdentifier(:final element)) {
       if (element is TopLevelFunctionElement &&
           element.name == 'print' &&
           element.library.isDartCore &&
@@ -215,7 +215,7 @@ extension BinaryExpressionExtension on BinaryExpression {
 extension ClassDeclarationExtension on ClassDeclaration {
   List<ClassMember> get members2 {
     switch (body) {
-      case BlockClassBody body:
+      case final BlockClassBody body:
         return body.members;
       default:
         return [];
@@ -235,12 +235,12 @@ extension CompilationUnitExtension on CompilationUnit {
   /// blank line, a directive, a declaration, or a multi-line comment). The list
   /// will never include a documentation comment.
   List<Token> get fileHeader {
-    var lineInfo = this.lineInfo;
+    final lineInfo = this.lineInfo;
     var firstToken = beginToken;
     if (firstToken.type == TokenType.SCRIPT_TAG) {
       firstToken = firstToken.next!;
     }
-    var firstComment = firstToken.precedingComments;
+    final firstComment = firstToken.precedingComments;
     if (firstComment == null ||
         firstComment.lexeme.startsWith('/**') ||
         firstComment.lexeme.startsWith('///')) {
@@ -250,7 +250,7 @@ extension CompilationUnitExtension on CompilationUnit {
     } else if (!firstComment.lexeme.startsWith('//')) {
       return const [];
     }
-    var header = <Token>[firstComment];
+    final header = <Token>[firstComment];
     var previousLine = lineInfo.getLocation(firstComment.offset).lineNumber;
     var currentToken = firstComment.next;
     while (currentToken != null) {
@@ -258,7 +258,7 @@ extension CompilationUnitExtension on CompilationUnit {
           currentToken.lexeme.startsWith('///')) {
         return header;
       }
-      var currentLine = lineInfo.getLocation(currentToken.offset).lineNumber;
+      final currentLine = lineInfo.getLocation(currentToken.offset).lineNumber;
       if (currentLine != previousLine + 1) {
         return header;
       }
@@ -272,13 +272,13 @@ extension CompilationUnitExtension on CompilationUnit {
   /// Returns names of elements that might conflict with a new local variable
   /// declared at [offset].
   Set<String> findPossibleLocalVariableConflicts(int offset) {
-    var enclosingNode = nodeCovering(offset: offset)!;
-    var enclosingBlock = enclosingNode.thisOrAncestorOfType<Block>();
+    final enclosingNode = nodeCovering(offset: offset)!;
+    final enclosingBlock = enclosingNode.thisOrAncestorOfType<Block>();
     if (enclosingBlock == null) {
       return {};
     }
 
-    var visitor = _ReferencedUnprefixedNamesCollector();
+    final visitor = _ReferencedUnprefixedNamesCollector();
     enclosingBlock.accept(visitor);
     return visitor.names;
   }
@@ -298,9 +298,9 @@ extension DirectiveExtension on Directive {
   /// If the target imports or exports a [LibraryElement], returns it.
   LibraryElement? get referencedLibrary {
     switch (this) {
-      case ExportDirective directive:
+      case final ExportDirective directive:
         return directive.libraryExport?.exportedLibrary;
-      case ImportDirective directive:
+      case final ImportDirective directive:
         return directive.libraryImport?.importedLibrary;
       default:
         return null;
@@ -310,7 +310,7 @@ extension DirectiveExtension on Directive {
   /// If [referencedUri] is a [DirectiveUriWithSource], returns the [Source]
   /// from it.
   Source? get referencedSource {
-    var uri = referencedUri;
+    final uri = referencedUri;
     if (uri is DirectiveUriWithSource) {
       return uri.source;
     }
@@ -320,11 +320,11 @@ extension DirectiveExtension on Directive {
   /// Returns the [DirectiveUri] from the element.
   DirectiveUri? get referencedUri {
     switch (this) {
-      case ExportDirective directive:
+      case final ExportDirective directive:
         return directive.libraryExport?.uri;
-      case ImportDirective directive:
+      case final ImportDirective directive:
         return directive.libraryImport?.uri;
-      case PartDirective directive:
+      case final PartDirective directive:
         return directive.partInclude?.uri;
       default:
         return null;
@@ -336,11 +336,11 @@ extension ExpressionExtension on Expression {
   /// Whether this [Expression] should be wrapped with parentheses when we want
   /// to use it as operand of a logical and-expression.
   bool get shouldWrapParenthesisBeforeAnd {
-    var self = this;
+    final self = this;
     if (self is! BinaryExpression) {
       return false;
     }
-    var precedence = self.operator.type.precedence;
+    final precedence = self.operator.type.precedence;
     return precedence < TokenClass.LOGICAL_AND_OPERATOR.precedence;
   }
 }
@@ -348,7 +348,7 @@ extension ExpressionExtension on Expression {
 extension ExtensionTypeDeclarationExtension on ExtensionTypeDeclaration {
   List<ClassMember> get members2 {
     switch (body) {
-      case BlockClassBody body:
+      case final BlockClassBody body:
         return body.members;
       default:
         return [];
@@ -364,7 +364,7 @@ extension FunctionBodyExtension on FunctionBody {
 
 extension MethodDeclarationExtension on MethodDeclaration {
   Token? get propertyKeywordGet {
-    var propertyKeyword = this.propertyKeyword;
+    final propertyKeyword = this.propertyKeyword;
     return propertyKeyword != null && propertyKeyword.keyword == Keyword.GET
         ? propertyKeyword
         : null;
@@ -375,28 +375,28 @@ extension MethodInvocationExtension on MethodInvocation {
   /// Returns whether this expression is an invocation of the method `cast`
   /// from either Iterable`, `List`, `Map`, or `Set`.
   bool get isCastMethodInvocation {
-    var element = methodName.element;
+    final element = methodName.element;
     return element is MethodElement && element.isCastMethod;
   }
 
   /// Returns whether this expression is an invocation of the method `toList`
   /// from `Iterable`.
   bool get isToListMethodInvocation {
-    var element = methodName.element;
+    final element = methodName.element;
     return element is MethodElement && element.isToListMethod;
   }
 
   /// Returns whether this expression is an invocation of the method `toSet`
   /// from `Iterable`.
   bool get isToSetMethodInvocation {
-    var element = methodName.element;
+    final element = methodName.element;
     return element is MethodElement && element.isToSetMethod;
   }
 }
 
 extension NamedTypeExtension on NamedType {
   String get qualifiedName {
-    var importPrefix = this.importPrefix;
+    final importPrefix = this.importPrefix;
     if (importPrefix != null) {
       return '${importPrefix.name.lexeme}.${name.lexeme}';
     } else {
@@ -411,7 +411,7 @@ extension NodeListExtension<E extends AstNode> on NodeList<E> {
   /// end of the first element.
   E? elementBefore(int offset) {
     for (var i = length - 1; i >= 0; i--) {
-      var element = this[i];
+      final element = this[i];
       if (element.end <= offset) {
         return element;
       }
@@ -422,11 +422,11 @@ extension NodeListExtension<E extends AstNode> on NodeList<E> {
 
 extension StatementExtension on Statement {
   ThrowStatement? get followingThrow {
-    var block = parent;
+    final block = parent;
     if (block is Block) {
-      var next = block.statements.nextOrNull(this);
+      final next = block.statements.nextOrNull(this);
       if (next is ExpressionStatement) {
-        var throwExpression = next.expression;
+        final throwExpression = next.expression;
         if (throwExpression is ThrowExpression) {
           return ThrowStatement(statement: next, expression: throwExpression);
         }
@@ -436,19 +436,19 @@ extension StatementExtension on Statement {
   }
 
   List<Statement> get selfOrBlockStatements {
-    var self = this;
+    final self = this;
     return self is Block ? self.statements : [self];
   }
 }
 
 extension TokenQuestionExtension on Token? {
   Token? get asFinalKeyword {
-    var self = this;
+    final self = this;
     return self != null && self.keyword == Keyword.FINAL ? self : null;
   }
 
   Token? get asVarKeyword {
-    var self = this;
+    final self = this;
     return self != null && self.keyword == Keyword.VAR ? self : null;
   }
 }

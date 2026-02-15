@@ -25,29 +25,29 @@ class MoveDown extends ResolvedCorrectionProducer {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
-    var widget = node.findComponentExpression;
+    final widget = node.findComponentExpression;
     if (widget == null) {
       return;
     }
 
-    var parentList = widget.parent;
+    final parentList = widget.parent;
     if (parentList is ListLiteral) {
-      List<CollectionElement> parentElements = parentList.elements;
-      var index = parentElements.indexOf(widget);
+      final List<CollectionElement> parentElements = parentList.elements;
+      final index = parentElements.indexOf(widget);
       if (index != parentElements.length - 1) {
         await builder.addDartFileEdit(file, (fileBuilder) {
-          var nextWidget = parentElements[index + 1];
-          var nextRange = range.node(nextWidget);
-          var nextText = utils.getRangeText(nextRange);
+          final nextWidget = parentElements[index + 1];
+          final nextRange = range.node(nextWidget);
+          final nextText = utils.getRangeText(nextRange);
 
-          var widgetRange = range.node(widget);
-          var widgetText = utils.getRangeText(widgetRange);
+          final widgetRange = range.node(widget);
+          final widgetText = utils.getRangeText(widgetRange);
 
           fileBuilder.addSimpleReplacement(nextRange, widgetText);
           fileBuilder.addSimpleReplacement(widgetRange, nextText);
 
-          var lengthDelta = nextRange.length - widgetRange.length;
-          var newWidgetOffset = nextRange.offset + lengthDelta;
+          final lengthDelta = nextRange.length - widgetRange.length;
+          final newWidgetOffset = nextRange.offset + lengthDelta;
           builder.setSelection(Position(file, newWidgetOffset));
         });
       }

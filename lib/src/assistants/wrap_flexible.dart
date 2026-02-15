@@ -4,11 +4,12 @@
 // See LICENSE file for details.
 
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
-import '../services/correction/assist.dart';
-import '../utilities/extensions/nocterm.dart';
 import 'package:analyzer_plugin/utilities/assist/assist.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
+
+import '../services/correction/assist.dart';
+import '../utilities/extensions/nocterm.dart';
 
 /// Wraps a component with Flexible (for flex contexts only).
 class WrapFlexible extends ResolvedCorrectionProducer {
@@ -23,18 +24,18 @@ class WrapFlexible extends ResolvedCorrectionProducer {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
-    var widgetExpr = node.findComponentExpression;
+    final widgetExpr = node.findComponentExpression;
     if (widgetExpr == null) {
       return;
     }
 
-    var widgetType = widgetExpr.staticType;
+    final widgetType = widgetExpr.staticType;
     if (widgetType == null || widgetType.isExactComponentTypeFlexible) {
       return;
     }
 
-    var widgetSrc = utils.getNodeText(widgetExpr);
-    var parentClassElement = await sessionHelper.getClass(
+    final widgetSrc = utils.getNodeText(widgetExpr);
+    final parentClassElement = await sessionHelper.getClass(
       noctermUri,
       'Flexible',
     );

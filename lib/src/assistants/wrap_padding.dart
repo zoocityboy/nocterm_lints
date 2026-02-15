@@ -4,11 +4,12 @@
 // See LICENSE file for details.
 
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
-import '../services/correction/assist.dart';
-import '../utilities/extensions/nocterm.dart';
 import 'package:analyzer_plugin/utilities/assist/assist.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
+
+import '../services/correction/assist.dart';
+import '../utilities/extensions/nocterm.dart';
 
 /// Wraps a component with Padding.
 class WrapPadding extends ResolvedCorrectionProducer {
@@ -23,18 +24,18 @@ class WrapPadding extends ResolvedCorrectionProducer {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
-    var widgetExpr = node.findComponentExpression;
+    final widgetExpr = node.findComponentExpression;
     if (widgetExpr == null) {
       return;
     }
 
-    var widgetType = widgetExpr.staticType;
+    final widgetType = widgetExpr.staticType;
     if (widgetType == null || widgetType.isExactComponentTypePadding) {
       return;
     }
 
-    var widgetSrc = utils.getNodeText(widgetExpr);
-    var parentClassElement = await sessionHelper.getClass(
+    final widgetSrc = utils.getNodeText(widgetExpr);
+    final parentClassElement = await sessionHelper.getClass(
       noctermUri,
       'Padding',
     );
@@ -44,15 +45,15 @@ class WrapPadding extends ResolvedCorrectionProducer {
 
     await builder.addDartFileEdit(file, (builder) {
       // var eol = builder.eol;
-      var keyword = widgetExpr.inConstantContext ? '' : ' const';
-      var codeStyleOptions = getCodeStyleOptions(unitResult.file);
-      var paddingStr = codeStyleOptions.preferIntLiterals ? '8' : '8.0';
+      final keyword = widgetExpr.inConstantContext ? '' : ' const';
+      final codeStyleOptions = getCodeStyleOptions(unitResult.file);
+      final paddingStr = codeStyleOptions.preferIntLiterals ? '8' : '8.0';
 
       builder.addReplacement(range.node(widgetExpr), (builder) {
         builder.writeReference(parentClassElement);
         builder.write('(');
         builder.writeln();
-        var indentNew =
+        final indentNew =
             '${utils.getLinePrefix(widgetExpr.offset)}${utils.oneIndent}';
         builder.write(indentNew);
         builder.write('padding:$keyword EdgeInsets.all($paddingStr),');

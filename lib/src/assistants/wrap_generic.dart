@@ -4,11 +4,12 @@
 // See LICENSE file for details.
 
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
-import '../services/correction/assist.dart';
-import '../utilities/extensions/nocterm.dart';
 import 'package:analyzer_plugin/utilities/assist/assist.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
+
+import '../services/correction/assist.dart';
+import '../utilities/extensions/nocterm.dart';
 
 /// Wraps a component with a generic 'component' placeholder.
 class WrapGeneric extends ResolvedCorrectionProducer {
@@ -23,7 +24,7 @@ class WrapGeneric extends ResolvedCorrectionProducer {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
-    var widgetExpr = node.findComponentExpression;
+    final widgetExpr = node.findComponentExpression;
     if (widgetExpr == null) {
       return;
     }
@@ -31,17 +32,17 @@ class WrapGeneric extends ResolvedCorrectionProducer {
     var widgetSrc = utils.getNodeText(widgetExpr);
 
     await builder.addDartFileEdit(file, (builder) {
-      var eol = builder.eol;
+      final eol = builder.eol;
       builder.addReplacement(range.node(widgetExpr), (builder) {
         builder.addSimpleLinkedEdit('COMPONENT', 'component');
         builder.write('(');
         builder.selectHere();
-        var leadingLines = <String>[];
+        final leadingLines = <String>[];
         if (widgetSrc.contains(eol) || leadingLines.isNotEmpty) {
-          var indentOld = utils.getLinePrefix(widgetExpr.offset);
-          var indentNew = '$indentOld${utils.oneIndent}';
+          final indentOld = utils.getLinePrefix(widgetExpr.offset);
+          final indentNew = '$indentOld${utils.oneIndent}';
 
-          for (var leadingLine in leadingLines) {
+          for (final leadingLine in leadingLines) {
             builder.writeln();
             builder.write(indentNew);
             builder.write(leadingLine);

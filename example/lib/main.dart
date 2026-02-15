@@ -9,8 +9,8 @@ void main() {
       home: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('This is an example app for nocterm_lints.'),
           Text('Run `dart analyze` to see lints/assists.'),
+          Text('This is an example app for nocterm_lints.'),
         ],
       ),
     ),

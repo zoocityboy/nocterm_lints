@@ -8,8 +8,9 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'string.dart';
 import 'package:collection/collection.dart';
+
+import 'string.dart';
 
 const _nameAlign = 'Align';
 const _nameBuildContext = 'BuildContext';
@@ -97,7 +98,7 @@ extension AstNodeExtension on AstNode? {
         return null;
       }
 
-      var parent = node.parent;
+      final parent = node.parent;
 
       if (parent is AssignmentExpression) {
         if (parent.rightHandSide == node) {
@@ -132,7 +133,7 @@ extension AstNodeExtension on AstNode? {
       AstNode(parent: AstNode(parent: NamedType())) => false,
       AstNode(parent: ConstructorName()) => false,
       NamedExpression() => false,
-      Expression(:var staticType) => staticType.isComponentType,
+      Expression(:final staticType) => staticType.isComponentType,
       _ => false,
     };
   }
@@ -143,12 +144,12 @@ extension AstNodeExtension on AstNode? {
   /// Returns `null` if this is not a [SimpleIdentifier], or if any other
   /// condition cannot be satisfied.
   NamedExpression? findArgumentNamed(String name) {
-    var self = this;
+    final self = this;
     if (self is! SimpleIdentifier) {
       return null;
     }
-    var parent = self.parent;
-    var grandParent = parent?.parent;
+    final parent = self.parent;
+    final grandParent = parent?.parent;
     if (parent is Label && grandParent is NamedExpression) {
       if (self.name != name) {
         return null;
@@ -156,7 +157,7 @@ extension AstNodeExtension on AstNode? {
     } else {
       return null;
     }
-    var invocation = grandParent.parent?.parent;
+    final invocation = grandParent.parent?.parent;
     if (invocation is! InstanceCreationExpression ||
         !invocation.isComponentCreation) {
       return null;
@@ -181,7 +182,7 @@ extension ClassElementExtension2 on ClassElement {
 extension DartTypeExtension on DartType? {
   /// Whether this is the Flutter type `BuildContext`.
   bool get isBuildContext {
-    var self = this;
+    final self = this;
     return self is InterfaceType &&
         self.nullabilitySuffix == NullabilitySuffix.none &&
         self.element._isExactly(_nameBuildContext, _uriFramework);
@@ -189,7 +190,7 @@ extension DartTypeExtension on DartType? {
 
   /// Whether this is the 'dart.ui' class `Color`, or a subtype.
   bool get isColor {
-    var self = this;
+    final self = this;
     if (self is! InterfaceType) {
       return false;
     }
@@ -201,84 +202,84 @@ extension DartTypeExtension on DartType? {
 
   /// Whether this is the Flutter type `EdgeInsetsGeometry`.
   bool get isExactEdgeInsetsGeometryType {
-    var self = this;
+    final self = this;
     return self is InterfaceType &&
         self.element._isExactly('EdgeInsetsGeometry', _uriEdgeInsets);
   }
 
   /// Whether this is the Flutter class `StatefulWidget`.
   bool get isExactlyStatefulComponentType {
-    var self = this;
+    final self = this;
     return self is InterfaceType &&
         self.element._isExactly(_nameStatefulComponent, _uriFramework);
   }
 
   /// Whether this is the Flutter class `StatelessWidget`.
   bool get isExactlyStatelessComponentType {
-    var self = this;
+    final self = this;
     return self is InterfaceType &&
         self.element._isExactly(_nameStatelessComponent, _uriFramework);
   }
 
   /// Whether this is the Flutter class `Align`.
   bool get isExactComponentTypeAlign {
-    var self = this;
+    final self = this;
     return self is InterfaceType &&
         self.element._isExactly(_nameAlign, _uriBasic);
   }
 
   /// Whether this is the Flutter class `Builder`.
   bool get isExactComponentTypeBuilder {
-    var self = this;
+    final self = this;
     return self is InterfaceType &&
         self.element._isExactly(_nameBuilder, _uriBasic);
   }
 
   /// Whether this is the Flutter class `Center`.
   bool get isExactComponentTypeCenter {
-    var self = this;
+    final self = this;
     return self is InterfaceType &&
         self.element._isExactly(_nameCenter, _uriBasic);
   }
 
   /// Whether this is the Flutter class `Container`.
   bool get isExactComponentTypeContainer {
-    var self = this;
+    final self = this;
     return self is InterfaceType &&
         self.element._isExactly(_nameContainer, _uriContainer);
   }
 
   /// Whether this is the Flutter class `Expanded`.
   bool get isExactComponentTypeExpanded {
-    var self = this;
+    final self = this;
     return self is InterfaceType &&
         self.element._isExactly(_nameExpanded, _uriBasic);
   }
 
   /// Whether this is the Flutter class `Flexible`.
   bool get isExactComponentTypeFlexible {
-    var self = this;
+    final self = this;
     return self is InterfaceType &&
         self.element._isExactly(_nameFlexible, _uriBasic);
   }
 
   /// Whether this is the Flutter class `Padding`.
   bool get isExactComponentTypePadding {
-    var self = this;
+    final self = this;
     return self is InterfaceType &&
         self.element._isExactly(_namePadding, _uriBasic);
   }
 
   /// Whether this is the Flutter class `SizedBox`.
   bool get isExactComponentTypeSizedBox {
-    var self = this;
+    final self = this;
     return self is InterfaceType &&
         self.element._isExactly(_nameSizedBox, _uriBasic);
   }
 
   /// Whether this is the Flutter class `Widget`, or its subtype.
   bool get isListOfWidgetsType {
-    var self = this;
+    final self = this;
     return self is InterfaceType &&
         self.isDartCoreList &&
         self.typeArguments[0].isComponentType;
@@ -287,7 +288,7 @@ extension DartTypeExtension on DartType? {
   /// Whether this is the vector_math_64 class `Matrix4`, or its
   /// subtype.
   bool get isMatrix4 {
-    var self = this;
+    final self = this;
     if (self is! InterfaceType) {
       return false;
     }
@@ -302,7 +303,7 @@ extension DartTypeExtension on DartType? {
   /// Whether this is a function type matching the Flutter typedef
   /// `WidgetBuilder` (i.e., `Widget Function(BuildContext context)`).
   bool get isWidgetBuilder {
-    var self = this;
+    final self = this;
     return self is FunctionType &&
         self.returnType.isComponentType &&
         self.formalParameters.length == 1 &&
@@ -311,7 +312,7 @@ extension DartTypeExtension on DartType? {
 
   /// Whether this is the Nocterm class `Component`, or its subtype.
   bool get isComponentType {
-    var self = this;
+    final self = this;
     return self is InterfaceType && self.element.isComponent;
   }
 }
@@ -319,31 +320,31 @@ extension DartTypeExtension on DartType? {
 extension ExpressionExtension on Expression {
   /// Whether this is the `builder` argument.
   bool get isBuilderArgument {
-    var self = this;
+    final self = this;
     return self is NamedExpression && self.name.label.name == 'builder';
   }
 
   /// Whether this is the `child` argument.
   bool get isChildArgument {
-    var self = this;
+    final self = this;
     return self is NamedExpression && self.name.label.name == 'child';
   }
 
   /// Whether this is the `children` argument.
   bool get isChildrenArgument {
-    var self = this;
+    final self = this;
     return self is NamedExpression && self.name.label.name == 'children';
   }
 
   /// Whether this is the `sliver` argument.
   bool get isSliverArgument {
-    var self = this;
+    final self = this;
     return self is NamedExpression && self.name.label.name == 'sliver';
   }
 
   /// Whether this is the `slivers` argument.
   bool get isSliversArgument {
-    var self = this;
+    final self = this;
     return self is NamedExpression && self.name.label.name == 'slivers';
   }
 }
@@ -377,11 +378,12 @@ extension InstanceCreationExpressionExtension on InstanceCreationExpression {
   /// Whether this is a constructor invocation for a class that has the Flutter
   /// class `Component` as a superclass.
   bool get isComponentCreation {
-    var element = constructorName.element?.enclosingElement;
+    final element = constructorName.element?.enclosingElement;
     return element.isComponent;
   }
 
-  /// The named expression representing the `sliver` argument, or `null` if there
+  /// The named expression representing
+  /// the `sliver` argument, or `null` if there
   /// is none.
   NamedExpression? get sliverArgument => argumentList.arguments
       .whereType<NamedExpression>()
@@ -395,15 +397,15 @@ extension InstanceCreationExpressionExtension on InstanceCreationExpression {
 
   /// The presentation for this node.
   String? get widgetPresentationText {
-    var element = constructorName.element?.enclosingElement;
+    final element = constructorName.element?.enclosingElement;
     if (!element.isComponent) {
       return null;
     }
-    var arguments = argumentList.arguments;
+    final arguments = argumentList.arguments;
     if (element._isExactly('Icon', _uriWidgetsIcon)) {
       if (arguments.isNotEmpty) {
-        var text = arguments[0].toString();
-        var arg = text.elideTo(32);
+        final text = arguments[0].toString();
+        final arg = text.elideTo(32);
         return 'Icon($arg)';
       } else {
         return 'Icon';
@@ -411,8 +413,8 @@ extension InstanceCreationExpressionExtension on InstanceCreationExpression {
     }
     if (element._isExactly('Text', _uriWidgetsText)) {
       if (arguments.isNotEmpty) {
-        var text = arguments[0].toString();
-        var arg = text.elideTo(32);
+        final text = arguments[0].toString();
+        final arg = text.elideTo(32);
         return 'Text($arg)';
       } else {
         return 'Text';
@@ -425,7 +427,7 @@ extension InstanceCreationExpressionExtension on InstanceCreationExpression {
 extension InterfaceElement2Extension on InterfaceElement? {
   /// Whether this is the Flutter class `Flex`, or a subtype.
   bool get isFlexWidget {
-    var self = this;
+    final self = this;
     if (self is! ClassElement) {
       return false;
     }
@@ -459,7 +461,7 @@ extension InterfaceElementExtension2 on InterfaceElement? {
 
   /// Whether this is the Flutter class `Component`, or a subtype.
   bool get isComponent {
-    var self = this;
+    final self = this;
     if (self is! ClassElement) {
       return false;
     }
@@ -474,13 +476,13 @@ extension InterfaceElementExtension2 on InterfaceElement? {
   /// Whether this has a supertype with the [requiredName] defined in the file
   /// with the [requiredUri].
   bool _hasSupertype(Uri requiredUri, String requiredName) {
-    var self = this;
+    final self = this;
     if (self == null) {
       return false;
     }
-    for (var type in self.allSupertypes) {
+    for (final type in self.allSupertypes) {
       if (type.element.name == requiredName) {
-        var uri = type.element.library.uri;
+        final uri = type.element.library.uri;
         if (uri == requiredUri) {
           return true;
         }
@@ -491,7 +493,7 @@ extension InterfaceElementExtension2 on InterfaceElement? {
 
   /// Whether this is the exact [type] defined in the file with the given [uri].
   bool _isExactly(String type, Uri uri) {
-    var self = this;
+    final self = this;
     log('isExactly: $self, $type, $uri');
     return self is ClassElement && self.name == type && self.library.uri == uri;
   }

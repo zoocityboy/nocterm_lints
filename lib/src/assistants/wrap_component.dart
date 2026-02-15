@@ -3,14 +3,15 @@
 // Use of this source code is governed by a BSD-3-Clause license.
 // See LICENSE file for details.
 
-import '../services/correction/assist.dart';
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 import 'package:analysis_server_plugin/src/utilities/extensions/string_extension.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import '../utilities/extensions/nocterm.dart';
 import 'package:analyzer_plugin/utilities/assist/assist.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
+
+import '../services/correction/assist.dart';
+import '../utilities/extensions/nocterm.dart';
 
 class WrapComponent extends ResolvedCorrectionProducer {
   WrapComponent({required super.context});
@@ -29,21 +30,23 @@ class WrapComponent extends ResolvedCorrectionProducer {
       return;
     }
     if ((node as ListLiteral).elements.any(
-      (CollectionElement element) =>
+      (element) =>
           !(element is InstanceCreationExpression &&
               element.isComponentCreation),
     )) {
       return;
     }
-    var eol = unitResult.content.endOfLine ?? builder.defaultEol;
-    var literalSrc = utils.getNodeText(node);
-    var newlineIdx = literalSrc.lastIndexOf(eol);
+    final eol = unitResult.content.endOfLine ?? builder.defaultEol;
+    final literalSrc = utils.getNodeText(node);
+    final newlineIdx = literalSrc.lastIndexOf(eol);
     if (newlineIdx < 0 || newlineIdx == literalSrc.length - 1) {
       return; // Lists need to be in multi-line format already.
     }
-    var indentOld = utils.getLinePrefix(node.offset + eol.length + newlineIdx);
-    var indentArg = '$indentOld${utils.oneIndent}';
-    var indentList = '$indentOld${utils.twoIndents}';
+    final indentOld = utils.getLinePrefix(
+      node.offset + eol.length + newlineIdx,
+    );
+    final indentArg = '$indentOld${utils.oneIndent}';
+    final indentList = '$indentOld${utils.twoIndents}';
 
     await builder.addDartFileEdit(file, (builder) {
       builder.addReplacement(range.node(node), (builder) {

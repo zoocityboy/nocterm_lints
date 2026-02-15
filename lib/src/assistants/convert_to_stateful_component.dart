@@ -15,9 +15,9 @@ import 'package:analyzer_plugin/utilities/assist/assist.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
 
-import '../utilities/extensions/nocterm.dart';
 import '../services/correction/assist.dart';
 import '../utilities/extensions/ast.dart';
+import '../utilities/extensions/nocterm.dart';
 import '../utilities/extensions/session_helper.dart';
 
 class ConvertToStatefulWidget extends ResolvedCorrectionProducer {
@@ -32,13 +32,13 @@ class ConvertToStatefulWidget extends ResolvedCorrectionProducer {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
-    var componentClass = node.thisOrAncestorOfType<ClassDeclaration>();
-    var superclass = componentClass?.extendsClause?.superclass;
+    final componentClass = node.thisOrAncestorOfType<ClassDeclaration>();
+    final superclass = componentClass?.extendsClause?.superclass;
     if (componentClass == null || superclass == null) {
       return;
     }
 
-    var body = componentClass.body;
+    final body = componentClass.body;
     if (body is! BlockClassBody) {
       return;
     }
@@ -50,49 +50,49 @@ class ConvertToStatefulWidget extends ResolvedCorrectionProducer {
     }
 
     // Must be a StatelessWidget subclass.
-    var componentClassElement = componentClass.declaredFragment!.element;
-    var superType = componentClassElement.supertype;
+    final componentClassElement = componentClass.declaredFragment!.element;
+    final superType = componentClassElement.supertype;
     if (superType == null || !superType.isExactlyStatelessComponentType) {
       return;
     }
 
-    var buildMethod = _findBuildMethod(componentClass);
+    final buildMethod = _findBuildMethod(componentClass);
     if (buildMethod == null) {
       return;
     }
 
-    var componentName = componentClassElement.displayName;
-    var stateName = componentClassElement.isPrivate
+    final componentName = componentClassElement.displayName;
+    final stateName = componentClassElement.isPrivate
         ? '${componentName}State'
         : '_${componentName}State';
 
     // Find fields assigned in constructors.
-    var visitor = _FieldFinder();
-    for (var member in body.members) {
+    final visitor = _FieldFinder();
+    for (final member in body.members) {
       if (member is ConstructorDeclaration) {
         member.accept(visitor);
       }
     }
-    var fieldsAssignedInConstructors = visitor.fieldsAssignedInConstructors;
+    final fieldsAssignedInConstructors = visitor.fieldsAssignedInConstructors;
 
     // Prepare nodes to move.
-    var nodesToMove = <ClassMember>{};
-    var elementsToMove = <Element>{};
-    for (var member in body.members) {
+    final nodesToMove = <ClassMember>{};
+    final elementsToMove = <Element>{};
+    for (final member in body.members) {
       if (member is FieldDeclaration && !member.isStatic) {
-        for (var fieldNode in member.fields.variables) {
-          var fieldFragment = fieldNode.declaredFragment as FieldFragment;
-          var fieldElement = fieldFragment.element;
+        for (final fieldNode in member.fields.variables) {
+          final fieldFragment = fieldNode.declaredFragment! as FieldFragment;
+          final fieldElement = fieldFragment.element;
           if (!fieldsAssignedInConstructors.contains(fieldElement)) {
             nodesToMove.add(member);
             elementsToMove.add(fieldElement);
 
-            var getter = fieldElement.getter;
+            final getter = fieldElement.getter;
             if (getter != null) {
               elementsToMove.add(getter);
             }
 
-            var setter = fieldElement.setter;
+            final setter = fieldElement.setter;
             if (setter != null) {
               elementsToMove.add(setter);
             }
@@ -109,11 +109,11 @@ class ConvertToStatefulWidget extends ResolvedCorrectionProducer {
     /// methods, that are not moved, are qualified with the corresponding
     /// instance `widget.`, or static `MyWidgetClass.` qualifier.
     String rewriteWidgetMemberReferences(AstNode movedNode) {
-      var linesRange = utils.getLinesRange(range.node(movedNode));
-      var text = utils.getRangeText(linesRange);
+      final linesRange = utils.getLinesRange(range.node(movedNode));
+      final text = utils.getRangeText(linesRange);
 
       // Insert `widget.` before references to the widget instance members.
-      var visitor = _ReplacementEditBuilder(
+      final visitor = _ReplacementEditBuilder(
         componentClassElement,
         elementsToMove,
         linesRange,
@@ -122,11 +122,11 @@ class ConvertToStatefulWidget extends ResolvedCorrectionProducer {
       return SourceEdit.applySequence(text, visitor.edits.reversed.toList());
     }
 
-    var statefulComponentClass = await getNoctermClass(
+    final statefulComponentClass = await getNoctermClass(
       sessionHelper,
       'StatefulComponent',
     );
-    var stateClass = await getNoctermClass(sessionHelper, 'State');
+    final stateClass = await getNoctermClass(sessionHelper, 'State');
     if (statefulComponentClass == null || stateClass == null) {
       return;
     }
@@ -140,7 +140,7 @@ class ConvertToStatefulWidget extends ResolvedCorrectionProducer {
       var hasBuildMethod = false;
 
       var typeParams = '';
-      var typeParameters = componentClass.namePart.typeParameters;
+      final typeParameters = componentClass.namePart.typeParameters;
       if (typeParameters != null) {
         typeParams = utils.getNodeText(typeParameters);
       }
@@ -153,7 +153,7 @@ class ConvertToStatefulWidget extends ResolvedCorrectionProducer {
         bool hasEmptyLineBeforeCreateState = false,
         bool hasEmptyLineAfterCreateState = true,
       }) {
-        var replaceLength = replaceEnd - replaceOffset;
+        final replaceLength = replaceEnd - replaceOffset;
         builder.addReplacement(SourceRange(replaceOffset, replaceLength), (
           builder,
         ) {
@@ -182,11 +182,11 @@ class ConvertToStatefulWidget extends ResolvedCorrectionProducer {
       // Remove continuous ranges of lines of nodes being moved.
       var lastToRemoveIsField = false;
       var endOfLastNodeToKeep = 0;
-      for (var node in body.members) {
+      for (final node in body.members) {
         if (nodesToMove.contains(node)) {
           if (replaceOffset == 0) {
-            var comments = node.beginToken.precedingComments;
-            var start = comments ?? node;
+            final comments = node.beginToken.precedingComments;
+            final start = comments ?? node;
             replaceOffset = utils.getLineContentStart(start.offset);
           }
           if (node == buildMethod) {
@@ -194,7 +194,7 @@ class ConvertToStatefulWidget extends ResolvedCorrectionProducer {
           }
           lastToRemoveIsField = node is FieldDeclaration;
         } else {
-          var linesRange = utils.getLinesRange(range.node(node));
+          final linesRange = utils.getLinesRange(range.node(node));
           endOfLastNodeToKeep = linesRange.end;
           if (replaceOffset != 0) {
             replaceInterval(
@@ -232,7 +232,7 @@ class ConvertToStatefulWidget extends ResolvedCorrectionProducer {
         if (typeParameters != null) {
           builder.write('<');
           var first = true;
-          for (var param in typeParameters.typeParameters) {
+          for (final param in typeParameters.typeParameters) {
             if (!first) {
               builder.write(', ');
               first = false;
@@ -245,19 +245,19 @@ class ConvertToStatefulWidget extends ResolvedCorrectionProducer {
         builder.writeln('> {');
 
         var writeEmptyLine = false;
-        for (var member in nodesToMove) {
+        for (final member in nodesToMove) {
           if (writeEmptyLine) {
             builder.writeln();
           }
 
-          var comments = member.beginToken.precedingComments;
+          final comments = member.beginToken.precedingComments;
           if (comments != null) {
-            var offset = utils.getLineContentStart(comments.offset);
-            var length = comments.end - offset;
+            final offset = utils.getLineContentStart(comments.offset);
+            final length = comments.end - offset;
             builder.writeln(utils.getText(offset, length));
           }
 
-          var text = rewriteWidgetMemberReferences(member);
+          final text = rewriteWidgetMemberReferences(member);
           builder.write(text);
           // Write empty lines between members, but not before the first.
           writeEmptyLine = true;
@@ -269,9 +269,9 @@ class ConvertToStatefulWidget extends ResolvedCorrectionProducer {
   }
 
   MethodDeclaration? _findBuildMethod(ClassDeclaration widgetClass) {
-    for (var member in widgetClass.members2) {
+    for (final member in widgetClass.members2) {
       if (member is MethodDeclaration && member.name.lexeme == 'build') {
-        var parameters = member.parameters;
+        final parameters = member.parameters;
         if (parameters != null && parameters.parameters.length == 1) {
           return member;
         }
@@ -286,9 +286,9 @@ class _FieldFinder extends RecursiveAstVisitor<void> {
 
   @override
   void visitFieldFormalParameter(FieldFormalParameter node) {
-    var element = node.declaredFragment?.element;
+    final element = node.declaredFragment?.element;
     if (element is FieldFormalParameterElement) {
-      var field = element.field;
+      final field = element.field;
       if (field != null) {
         fieldsAssignedInConstructors.add(field);
       }
@@ -300,15 +300,15 @@ class _FieldFinder extends RecursiveAstVisitor<void> {
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
     if (node.parent is ConstructorFieldInitializer) {
-      var element = node.element;
+      final element = node.element;
       if (element is FieldElement) {
         fieldsAssignedInConstructors.add(element);
       }
     }
     if (node.inSetterContext()) {
-      var element = node.writeOrReadElement;
+      final element = node.writeOrReadElement;
       if (element is SetterElement) {
-        var field = element.variable;
+        final field = element.variable;
         if (field is FieldElement) {
           fieldsAssignedInConstructors.add(field);
         }
@@ -318,6 +318,11 @@ class _FieldFinder extends RecursiveAstVisitor<void> {
 }
 
 class _ReplacementEditBuilder extends RecursiveAstVisitor<void> {
+  _ReplacementEditBuilder(
+    this.componentClassElement,
+    this.elementsToMove,
+    this.linesRange,
+  );
   final ClassElement componentClassElement;
 
   final Set<Element> elementsToMove;
@@ -326,27 +331,21 @@ class _ReplacementEditBuilder extends RecursiveAstVisitor<void> {
 
   List<SourceEdit> edits = [];
 
-  _ReplacementEditBuilder(
-    this.componentClassElement,
-    this.elementsToMove,
-    this.linesRange,
-  );
-
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
     if (node.inDeclarationContext()) {
       return;
     }
-    var element = node.element;
+    final element = node.element;
     if (element is ExecutableElement &&
         element.enclosingElement == componentClassElement &&
         !elementsToMove.contains(element)) {
-      var offset = node.offset - linesRange.offset;
-      var qualifier = element.isStatic
+      final offset = node.offset - linesRange.offset;
+      final qualifier = element.isStatic
           ? componentClassElement.displayName
           : 'component';
 
-      var parent = node.parent;
+      final parent = node.parent;
       if (parent is InterpolationExpression &&
           parent.leftBracket.type ==
               TokenType.STRING_INTERPOLATION_IDENTIFIER) {

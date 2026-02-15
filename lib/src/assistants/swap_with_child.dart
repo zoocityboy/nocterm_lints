@@ -8,9 +8,9 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer_plugin/utilities/assist/assist.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
-import 'package:nocterm_lints/utilities/extensions/nocterm.dart';
 
 import '../services/correction/assist.dart';
+import '../utilities/extensions/nocterm.dart';
 
 abstract class ParentAndChild extends ResolvedCorrectionProducer {
   ParentAndChild({required super.context});
@@ -27,7 +27,7 @@ abstract class ParentAndChild extends ResolvedCorrectionProducer {
   ) async {
     // Find the expression that corresponds to the child.
     NamedExpression? childArgumentInParent;
-    for (var arg in parent.argumentList.arguments) {
+    for (final arg in parent.argumentList.arguments) {
       if (arg is NamedExpression && arg.expression == child) {
         childArgumentInParent = arg;
         break;
@@ -36,9 +36,9 @@ abstract class ParentAndChild extends ResolvedCorrectionProducer {
 
     // The child must have its own single child.
     AstNode stableChild;
-    if (_singleChildInChildren(child) case var first?) {
+    if (_singleChildInChildren(child) case final first?) {
       stableChild = first;
-    } else if (child.childArgument case var childArgument?) {
+    } else if (child.childArgument case final childArgument?) {
       stableChild = childArgument;
     } else {
       return;
@@ -46,15 +46,17 @@ abstract class ParentAndChild extends ResolvedCorrectionProducer {
 
     await builder.addDartFileEdit(file, (builder) {
       builder.addReplacement(range.node(parent), (builder) {
-        var childArgs = child.argumentList;
-        var parentArgs = parent.argumentList;
-        var childText = utils.getRangeText(range.startStart(child, childArgs));
-        var parentText = utils.getRangeText(
+        final childArgs = child.argumentList;
+        final parentArgs = parent.argumentList;
+        final childText = utils.getRangeText(
+          range.startStart(child, childArgs),
+        );
+        final parentText = utils.getRangeText(
           range.startStart(parent, parentArgs),
         );
 
-        var parentIndent = utils.getLinePrefix(parent.offset);
-        var childIndent = '$parentIndent  ';
+        final parentIndent = utils.getLinePrefix(parent.offset);
+        final childIndent = '$parentIndent  ';
 
         // Write the beginning of the child.
         builder.write(childText);
@@ -62,7 +64,7 @@ abstract class ParentAndChild extends ResolvedCorrectionProducer {
 
         // Write all the arguments of the parent.
         // Don't write the "child".
-        for (var argument in childArgs.arguments) {
+        for (final argument in childArgs.arguments) {
           if (argument != stableChild) {
             var text = utils.getNodeText(argument);
             text = utils.replaceSourceIndent(text, childIndent, parentIndent);
@@ -82,7 +84,7 @@ abstract class ParentAndChild extends ResolvedCorrectionProducer {
 
         // Write all arguments of the parent.
         // Don't write its child/children.
-        for (var argument in parentArgs.arguments) {
+        for (final argument in parentArgs.arguments) {
           if (argument != childArgumentInParent && !argument.isChildArgument) {
             var text = utils.getNodeText(argument);
             text = utils.replaceSourceIndent(text, parentIndent, childIndent);
@@ -93,7 +95,6 @@ abstract class ParentAndChild extends ResolvedCorrectionProducer {
           }
         }
 
-        // Write the child(ren) of the "child" now, as the child(ren) of the "parent".
         {
           var text = utils.getNodeText(stableChild);
           if (text.trim().startsWith('child: ')) {
@@ -140,9 +141,9 @@ abstract class ParentAndChild extends ResolvedCorrectionProducer {
   InstanceCreationExpression? _singleChildInChildren(
     InstanceCreationExpression parent,
   ) {
-    if (parent.childrenArgument case var childrenArgument?) {
-      if (childrenArgument.expression case ListLiteral list) {
-        if (list.elements case NodeList(length: 1, first: var first)) {
+    if (parent.childrenArgument case final childrenArgument?) {
+      if (childrenArgument.expression case final ListLiteral list) {
+        if (list.elements case NodeList(length: 1, first: final first)) {
           if (first is InstanceCreationExpression) {
             return first;
           }
@@ -161,14 +162,14 @@ class SwapWithChild extends ParentAndChild {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
-    var parent = node.findInstanceCreationExpression;
+    final parent = node.findInstanceCreationExpression;
     if (parent == null || !parent.isComponentCreation) {
       return;
     }
     var parentHasSingleChild = true;
 
     Expression? child;
-    if (_singleChildInChildren(parent) case var first?) {
+    if (_singleChildInChildren(parent) case final first?) {
       child = first;
       parentHasSingleChild = false;
     }

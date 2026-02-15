@@ -3,18 +3,19 @@
 // Use of this source code is governed by a BSD-3-Clause license.
 // See LICENSE file for details.
 
-import '../services/correction/assist.dart';
-import '../services/correction/selection_analyzer.dart';
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/source/source_range.dart';
 import 'package:analyzer/src/dart/ast/extensions.dart';
-import '../utilities/extensions/nocterm.dart';
 import 'package:analyzer_plugin/utilities/assist/assist.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
+
+import '../services/correction/assist.dart';
+import '../services/correction/selection_analyzer.dart';
+import '../utilities/extensions/nocterm.dart';
 
 /// Coordinates registration of wrap-based code assists for Nocterm components.
 ///
@@ -26,14 +27,14 @@ class Wrap extends MultiCorrectionProducer {
 
   @override
   Future<List<ResolvedCorrectionProducer>> get producers async {
-    var producers = <ResolvedCorrectionProducer>[];
-    var widgetExpr = node.findComponentExpression;
+    final producers = <ResolvedCorrectionProducer>[];
+    final widgetExpr = node.findComponentExpression;
     if (widgetExpr == null) {
       return producers;
     }
 
     try {
-      var widgetType = widgetExpr.typeOrThrow;
+      final widgetType = widgetExpr.typeOrThrow;
 
       // Always provide generic wrap option
       _registerProducer(producers, WrapGeneric(widgetExpr, context: context));
@@ -94,17 +95,17 @@ class Wrap extends MultiCorrectionProducer {
   Future<void> _registerMultiWidgetWrappers(
     List<ResolvedCorrectionProducer> producers,
   ) async {
-    var selectionRange = SourceRange(selectionOffset, selectionLength);
-    var analyzer = SelectionAnalyzer(selectionRange);
+    final selectionRange = SourceRange(selectionOffset, selectionLength);
+    final analyzer = SelectionAnalyzer(selectionRange);
     unitResult.unit.accept(analyzer);
 
-    var widgetExpressions = _extractSelectedWidgetExpressions(analyzer);
+    final widgetExpressions = _extractSelectedWidgetExpressions(analyzer);
     if (widgetExpressions.isEmpty) {
       return;
     }
 
-    var firstWidget = widgetExpressions.first;
-    var lastWidget = widgetExpressions.last;
+    final firstWidget = widgetExpressions.first;
+    final lastWidget = widgetExpressions.last;
 
     _registerProducer(
       producers,
@@ -120,7 +121,7 @@ class Wrap extends MultiCorrectionProducer {
   List<Expression> _extractSelectedWidgetExpressions(
     SelectionAnalyzer analyzer,
   ) {
-    var widgetExpressions = <Expression>[];
+    final widgetExpressions = <Expression>[];
 
     if (analyzer.hasSelectedNodes) {
       for (var selectedNode in analyzer.selectedNodes) {
@@ -129,7 +130,7 @@ class Wrap extends MultiCorrectionProducer {
         //
         //    Text('foo')
         //   [^^^^]
-        var parent = selectedNode.parent;
+        final parent = selectedNode.parent;
         if (selectedNode is ConstructorName &&
             parent is InstanceCreationExpression) {
           selectedNode = parent;
@@ -153,7 +154,7 @@ class Wrap extends MultiCorrectionProducer {
         coveringNode = coveringNode.parent;
       }
 
-      var widget = coveringNode.findComponentExpression;
+      final widget = coveringNode.findComponentExpression;
       if (widget != null) {
         widgetExpressions.add(widget);
       }
@@ -285,9 +286,9 @@ class WrapPadding extends _WrapSingleWidget {
 
   @override
   List<String> get _leadingLines {
-    var keyword = widgetExpr.inConstantContext ? '' : ' const';
-    var codeStyleOptions = getCodeStyleOptions(unitResult.file);
-    var paddingStr = codeStyleOptions.preferIntLiterals ? '8' : '8.0';
+    final keyword = widgetExpr.inConstantContext ? '' : ' const';
+    final codeStyleOptions = getCodeStyleOptions(unitResult.file);
+    final paddingStr = codeStyleOptions.preferIntLiterals ? '8' : '8.0';
     return ['padding:$keyword EdgeInsets.all($paddingStr),'];
   }
 
@@ -328,15 +329,14 @@ class WrapSizedBox extends _WrapSingleWidget {
 /// A correction processor that can make one of the possible changes computed by
 /// the [Wrap] producer.
 abstract class _WrapMultipleWidgets extends ResolvedCorrectionProducer {
-  final Expression firstWidget;
-
-  final Expression lastWidget;
-
   _WrapMultipleWidgets(
     this.firstWidget,
     this.lastWidget, {
     required super.context,
   });
+  final Expression firstWidget;
+
+  final Expression lastWidget;
 
   @override
   CorrectionApplicability get applicability =>
@@ -349,13 +349,13 @@ abstract class _WrapMultipleWidgets extends ResolvedCorrectionProducer {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
-    var selectedRange = range.startEnd(firstWidget, lastWidget);
-    var src = utils.getRangeText(selectedRange);
-    var parentClassElement = await sessionHelper.getClass(
+    final selectedRange = range.startEnd(firstWidget, lastWidget);
+    final src = utils.getRangeText(selectedRange);
+    final parentClassElement = await sessionHelper.getClass(
       _parentLibraryUri,
       _parentClassName,
     );
-    var widgetClassElement = await sessionHelper.getFlutterClass('Widget');
+    final widgetClassElement = await sessionHelper.getFlutterClass('Widget');
     if (parentClassElement == null || widgetClassElement == null) {
       return;
     }
@@ -365,16 +365,16 @@ abstract class _WrapMultipleWidgets extends ResolvedCorrectionProducer {
         builder.writeReference(parentClassElement);
         builder.write('(');
 
-        var indentOld = utils.getLinePrefix(firstWidget.offset);
-        var indentNew1 = indentOld + utils.oneIndent;
-        var indentNew2 = indentOld + utils.twoIndents;
+        final indentOld = utils.getLinePrefix(firstWidget.offset);
+        final indentNew1 = indentOld + utils.oneIndent;
+        final indentNew2 = indentOld + utils.twoIndents;
 
         builder.writeln();
         builder.write(indentNew1);
         builder.write('children: [');
         builder.writeln();
 
-        var newSrc = utils.replaceSourceIndent(src, indentOld, indentNew2);
+        final newSrc = utils.replaceSourceIndent(src, indentOld, indentNew2);
         builder.write(indentNew2);
         builder.write(newSrc);
 
@@ -395,9 +395,8 @@ abstract class _WrapMultipleWidgets extends ResolvedCorrectionProducer {
 /// A correction processor that can make one of the possible changes computed by
 /// the [Wrap] producer.
 abstract class _WrapSingleWidget extends ResolvedCorrectionProducer {
-  final Expression widgetExpr;
-
   _WrapSingleWidget(this.widgetExpr, {required super.context});
+  final Expression widgetExpr;
 
   @override
   CorrectionApplicability get applicability =>
@@ -415,8 +414,8 @@ abstract class _WrapSingleWidget extends ResolvedCorrectionProducer {
     var widgetSrc = utils.getNodeText(widgetExpr);
 
     // If the wrapper class is specified, find its element.
-    var parentLibraryUri = _parentLibraryUri;
-    var parentClassName = _parentClassName;
+    final parentLibraryUri = _parentLibraryUri;
+    final parentClassName = _parentClassName;
     ClassElement? parentClassElement;
     if (parentLibraryUri != null && parentClassName != null) {
       parentClassElement = await sessionHelper.getClass(
@@ -429,7 +428,7 @@ abstract class _WrapSingleWidget extends ResolvedCorrectionProducer {
     }
 
     await builder.addDartFileEdit(file, (builder) {
-      var eol = builder.eol;
+      final eol = builder.eol;
       builder.addReplacement(range.node(widgetExpr), (builder) {
         if (parentClassElement == null) {
           builder.addSimpleLinkedEdit('COMPONENT', 'component');
@@ -443,12 +442,12 @@ abstract class _WrapSingleWidget extends ResolvedCorrectionProducer {
         if (parentClassElement != null) {
           builder.selectHere();
         }
-        var leadingLines = _leadingLines;
+        final leadingLines = _leadingLines;
         if (widgetSrc.contains(eol) || leadingLines.isNotEmpty) {
-          var indentOld = utils.getLinePrefix(widgetExpr.offset);
-          var indentNew = '$indentOld${utils.oneIndent}';
+          final indentOld = utils.getLinePrefix(widgetExpr.offset);
+          final indentNew = '$indentOld${utils.oneIndent}';
 
-          for (var leadingLine in leadingLines) {
+          for (final leadingLine in leadingLines) {
             builder.writeln();
             builder.write(indentNew);
             builder.write(leadingLine);
@@ -482,7 +481,7 @@ extension on Expression {
   /// This is used to determine if the widget is wrapped in a `Row`, `Column`,
   /// or `Flex` widget.
   bool get isParentFlexWidget {
-    var parent = _getParentInstanceCreationExpression();
+    final parent = _getParentInstanceCreationExpression();
     if (parent == null || !parent.isComponentCreation) {
       return false;
     }
@@ -495,7 +494,7 @@ extension on Expression {
   /// It will return `false` if we are assigning this to a variable or
   /// returning it from a function or other similar cases.
   bool get isParentWidget {
-    var parent = _getParentInstanceCreationExpression();
+    final parent = _getParentInstanceCreationExpression();
     return parent != null && parent.isComponentCreation;
   }
 
@@ -503,16 +502,16 @@ extension on Expression {
   ///
   /// This is used to find the parent widget creation if it exists.
   InstanceCreationExpression? _getParentInstanceCreationExpression() {
-    var self = this;
+    final self = this;
     NamedExpression? namedExpression;
-    if (self.parent case ListLiteral listLiteral) {
-      if (listLiteral.parent case NamedExpression parent) {
+    if (self.parent case final ListLiteral listLiteral) {
+      if (listLiteral.parent case final NamedExpression parent) {
         namedExpression = parent;
       }
     }
     // NamedExpression (child:), ArgumentList, InstanceCreationExpression
     if ((namedExpression ?? self.parent)?.parent?.parent
-        case InstanceCreationExpression parent?) {
+        case final InstanceCreationExpression parent?) {
       return parent;
     }
     return null;
@@ -521,7 +520,7 @@ extension on Expression {
 
 extension on DartType? {
   bool get isComponentFlexType {
-    var self = this;
+    final self = this;
     return self is InterfaceType && self.element.isFlexWidget;
   }
 }

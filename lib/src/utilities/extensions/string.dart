@@ -22,7 +22,8 @@ extension AsciiCharacterCodeExtension on int {
   /// Whether this character code represents an underscore.
   bool get isAsciiUnderscore => this == 0x5F;
 
-  /// Whether this character code represents a space, tab, newline, or carriage return.
+  /// Whether this character code represents a space, tab, newline,
+  /// or carriage return.
   bool get isAsciiWhitespace => isAsciiSpace || isAsciiEndOfLine;
 
   /// Whether this character code represents a newline or carriage return.
@@ -67,19 +68,19 @@ extension StringIterableFormattingExtension on Iterable<String> {
   ///
   /// If [quoted] is true, each element is wrapped in single quotes.
   String _formatWithConjunction(String conjunction, {bool quoted = false}) {
-    var iterator = this.iterator;
+    final iterator = this.iterator;
 
     // Empty list
     if (!iterator.moveNext()) {
       return '';
     }
-    var first = iterator.current;
+    final first = iterator.current;
 
     // Single element
     if (!iterator.moveNext()) {
       return quoted ? "'$first'" : first;
     }
-    var second = iterator.current;
+    final second = iterator.current;
 
     // Two elements
     if (!iterator.moveNext()) {
@@ -87,9 +88,9 @@ extension StringIterableFormattingExtension on Iterable<String> {
           ? "'$first' $conjunction '$second'"
           : '$first $conjunction $second';
     }
-    var third = iterator.current;
+    final third = iterator.current;
 
-    var buffer = StringBuffer();
+    final buffer = StringBuffer();
     _appendFormattedElement(buffer, first, quoted);
     buffer.write(', ');
     _appendFormattedElement(buffer, second, quoted);
@@ -136,9 +137,11 @@ extension PluralizedStringExtension on String {
 
 /// Utilities for string manipulation and transformation.
 extension StringUtilitiesExtension on String {
-  /// Truncates this string to [limit] characters, replacing the middle with '...'.
+  /// Truncates this string to [limit] characters,
+  /// replacing the middle with '...'.
   ///
-  /// If this string's length exceeds [limit], the middle is replaced with '...'
+  /// If this string's length exceeds [limit],
+  /// the middle is replaced with '...'
   /// to maintain approximately equal head and tail visibility.
   ///
   /// Examples:
@@ -146,8 +149,8 @@ extension StringUtilitiesExtension on String {
   /// - "hello world test".elideTo(12) → "hello...test"
   String elideTo(int limit) {
     if (length > limit) {
-      var headLength = limit ~/ 2 - 1;
-      var tailLength = limit - headLength - 3;
+      final headLength = limit ~/ 2 - 1;
+      final tailLength = limit - headLength - 3;
       return '${substring(0, headLength)}...${substring(length - tailLength)}';
     }
     return this;
@@ -195,33 +198,33 @@ extension StringUtilitiesExtension on String {
     if (isEmpty) return this;
 
     // Preserve leading underscores (e.g., Dart private members).
-    var leading = RegExp(r'^_+').stringMatch(this) ?? '';
+    final leading = RegExp('^_+').stringMatch(this) ?? '';
     var result = substring(leading.length);
 
     // Split lower/digit -> Upper (e.g., "fooBar" -> "foo_Bar", "v2X" -> "v2_X").
     result = result.replaceAllMapped(
-      RegExp(r'([a-z0-9])([A-Z])'),
+      RegExp('([a-z0-9])([A-Z])'),
       (match) => '${match[1]}_${match[2]}',
     );
 
     // Split acronym -> Word (e.g., "HTMLParser" -> "HTML_Parser").
     result = result.replaceAllMapped(
-      RegExp(r'([A-Z]+)([A-Z][a-z])'),
+      RegExp('([A-Z]+)([A-Z][a-z])'),
       (match) => '${match[1]}_${match[2]}',
     );
 
     // Separate letters and digits both ways (e.g., "ID10T" -> "ID_10_T").
     result = result.replaceAllMapped(
-      RegExp(r'([A-Za-z])([0-9])'),
+      RegExp('([A-Za-z])([0-9])'),
       (match) => '${match[1]}_${match[2]}',
     );
     result = result.replaceAllMapped(
-      RegExp(r'([0-9])([A-Za-z])'),
+      RegExp('([0-9])([A-Za-z])'),
       (match) => '${match[1]}_${match[2]}',
     );
 
     // Normalize separators and scream.
-    result = result.replaceAll(RegExp(r'_+'), '_');
+    result = result.replaceAll(RegExp('_+'), '_');
     return leading + result.toUpperCase();
   }
 }

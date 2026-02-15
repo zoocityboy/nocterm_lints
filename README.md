@@ -8,6 +8,7 @@
 [![Pub](https://img.shields.io/pub/v/nocterm_lints.svg)](https://pub.dev/packages/nocterm_lints)
 [![Dart](https://img.shields.io/badge/Dart-0175C2?logo=dart)](https://dart.dev)
 [![Nocterm](https://img.shields.io/badge/NOCTERM-f2f2f2?logo=nocterm&logoColor=000000)](https://nocterm.dev)
+
 **Productivity assists for Nocterm terminal UI development**
 
 An analysis server plugin providing intelligent IDE assists and refactoring tools for building Nocterm terminal UI components. Works seamlessly in VS Code, IntelliJ IDEA, Android Studio, and other Dart-enabled editors.

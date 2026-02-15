@@ -47,7 +47,7 @@ extension ElementExtensions on Element {
     var current = this;
     while (true) {
       yield current;
-      var enclosing = current.enclosingElement;
+      final enclosing = current.enclosingElement;
       if (enclosing == null) {
         break;
       }
@@ -62,7 +62,7 @@ extension FragmentExtensions on Fragment {
     var current = this;
     while (true) {
       yield current;
-      var enclosing = current.enclosingFragment;
+      final enclosing = current.enclosingFragment;
       if (enclosing == null) {
         break;
       }
@@ -78,7 +78,7 @@ extension MethodElementExtensions on MethodElement {
     if (name != 'cast') {
       return false;
     }
-    var definingClass = enclosingElement;
+    final definingClass = enclosingElement;
     if (definingClass is! ClassElement) {
       return false;
     }
@@ -94,7 +94,7 @@ extension MethodElementExtensions on MethodElement {
     if (name != 'toList') {
       return false;
     }
-    var definingClass = enclosingElement;
+    final definingClass = enclosingElement;
     if (definingClass is! ClassElement) {
       return false;
     }
@@ -107,7 +107,7 @@ extension MethodElementExtensions on MethodElement {
     if (name != 'toSet') {
       return false;
     }
-    var definingClass = enclosingElement;
+    final definingClass = enclosingElement;
     if (definingClass is! ClassElement) {
       return false;
     }
