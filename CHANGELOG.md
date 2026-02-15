@@ -1,4 +1,4 @@
-# 0.3.0+dev.1
+# 0.3.0+beta.1
   
 - **chore**: wrong format of tag versions
 
