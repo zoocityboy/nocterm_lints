@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "nocterm_lints",
+			"path": "."
+		},
+		{
+			"name": "nocterm_example",
+			"path": "example"
+		}
+	],
+	"settings": {}
+}

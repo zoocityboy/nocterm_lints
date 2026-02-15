@@ -1,2 +1,6 @@
+analyzer:
+  errors:
+    depend_on_referenced_packages: ignore
+    implementation_imports: ignore
 include: package:lints/recommended.yaml
 

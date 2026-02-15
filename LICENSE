@@ -1,5 +1,29 @@
-MIT
+MIT License with BSD-3-Clause Derivative Works
 
+This project is dual-licensed:
+
+## Original Derivative Works (BSD-3-Clause)
+
+Portions of this software are derived from the Dart project and retain their
+original BSD-3-Clause license:
+
+```
+Copyright (c) 2020, the Dart project authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be found
+in the LICENSE.dart file distributed with the Dart SDK:
+https://github.com/dart-lang/sdk/blob/main/LICENSE
+```
+
+The following files are derived from the Dart project with modifications:
+- lib/nocterm/* (Dart assists adapted for Nocterm)
+- lib/utilities/extensions/ast.dart
+- lib/utilities/extensions/element.dart
+
+## Original and Modified Works (MIT License)
+
+All other code, including modifications to derived files and new implementations:
+
+```
 Copyright (c) 2026 zoocityboy
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -19,3 +43,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+```
+
+## Compliance
+
+This dual licensing ensures compliance with both:
+- The MIT License for new original works
+- The BSD-3-Clause License for derived Dart project code
+- The Dart SDK's license requirements

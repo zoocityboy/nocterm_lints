@@ -1,31 +1,63 @@
+<!-- <p align="center">
+<img src="https://raw.githubusercontent.com/zoocityboy/nocterm_lints/refs/heads/main/assets/nocterm_lints.png" height="100" alt="Bloc">
+</p> -->
+
 # nocterm_lints
 
-`nocterm_lints` is an analysis server plugin that provides IDE assists and lints tailored for Nocterm terminal UI components. It uses the modern `analysis_server_plugin` framework to deliver quick-fixes, refactor assists, and diagnostics that speed up authoring Nocterm-based UI code.
 
-> [!note]
-> This README focuses on using the plugin during development. If you are integrating the published package, replace local `path:` references with the package version.
+[![Pub](https://img.shields.io/pub/v/nocterm_lints.svg)](https://pub.dev/packages/nocterm_lints)
+[![Dart](https://img.shields.io/badge/Dart-0175C2?logo=dart)](https://dart.dev)
+[![Nocterm](https://img.shields.io/badge/NOCTERM-f2f2f2?logo=nocterm&logoColor=000000)](https://nocterm.dev)
+**Productivity assists for Nocterm terminal UI development**
 
-## Highlights
+An analysis server plugin providing intelligent IDE assists and refactoring tools for building Nocterm terminal UI components. Works seamlessly in VS Code, IntelliJ IDEA, Android Studio, and other Dart-enabled editors.
 
-- Editor assists for common refactorings and wrappers (wrap with padding/center/row/column, swap parent/child, remove wrapper).
-- Small, focused lint rules (example: discourage `print()` in production code).
-- Built as an `analysis_server_plugin` so assists show up in VS Code and JetBrains IDEs via the Dart analysis server.
+> [!info]
+> Built on the modern `analysis_server_plugin` framework (Dart 3.10+). Originally derived from Dart project foundations and enhanced for Nocterm-specific workflows.
 
-## Quick Start
+## Features
 
-1. Add the plugin to your project's `analysis_options.yaml`.
+**19 productivity assists** organized into four categories:
 
-Local (during development in a monorepo):
+### Component Manipulation (5)
+- **Move Up/Down** — Reorder components up or down in the tree
+- **Swap with Child** — Exchange positions with immediate child
+- **Swap with Parent** — Exchange positions with parent component  
+- **Remove Component** — Delete wrapper while preserving children
+
+### Component Wrapping (10)
+- **Wrap with Component** — Choose from available component types
+- **Wrap with Generic** — Container with customizable child
+- **Wrap with Center** — Center-align component
+- **Wrap with Container** — Add styling container
+- **Wrap with Padding** — Add spacing (default: 8dp)
+- **Wrap with Row/Column** — Create horizontal/vertical layouts
+- **Wrap with Expanded/Flexible** — Control sizing in flex contexts
+- **Wrap with SizedBox** — Define explicit dimensions
+
+### Layout Builders (2)
+- **Wrap with Builder** — Builder pattern wrapper
+- **Wrap with ValueListenableBuilder** — Reactive state pattern
+
+### Component Conversion (2)
+- **Convert to Stateful** — Refactor to StatefulComponent
+- **Convert to Stateless** — Refactor to StatelessComponent
+
+## Getting Started
+
+### For Development (Local Path)
+
+Add to your project's `analysis_options.yaml`:
 
 ```yaml
 include: package:nocterm_lints/recommended.yaml
 
 plugins:
   nocterm_lints:
-    path: ../packages/nocterm_lints
+    path: ../path/to/nocterm_lints
 ```
 
-Published package (replace with actual version when published):
+### For Published Package
 
 ```yaml
 include: package:nocterm_lints/recommended.yaml
@@ -34,136 +66,148 @@ plugins:
   nocterm_lints: ^0.1.0
 ```
 
-> [!warning]
-> After changing `analysis_options.yaml`, restart the Dart Analysis Server to activate plugin assists and diagnostics.
+### Activate Assists
 
-### Restart Analysis Server
+After updating `analysis_options.yaml`, restart the Dart Analysis Server:
 
-- VS Code: `Cmd+Shift+P` → `Dart: Restart Analysis Server`
-- IntelliJ / Android Studio: Tools → Dart Analysis Server → Restart
+| Editor | Command |
+|--------|---------|
+| **VS Code** | `Cmd+Shift+P` → "Dart: Restart Analysis Server" |
+| **IntelliJ / Android Studio** | Tools → Dart Analysis → Restart |
 
-## Features
+> [!tip]
+> Use `Cmd+.` (macOS) or `Ctrl+.` (Windows/Linux) to see available assists when the cursor is on a component.
 
-### Assists
-- Wrap with Widget — wrap an expression with a generic container and edit constructor arguments.
-- Wrap with Padding — insert a `Padding(...)` wrapper with a sensible default.
-- Wrap with Center — center a child component.
-- Wrap with Row / Column — wrap to create horizontal/vertical layout.
-- Remove this component — remove an unnecessary wrapper while preserving its child.
-- Swap with child / parent — swap positions between a widget and its parent/child to quickly refactor layout.
+## Usage Examples
 
-### Lints
-- `no_print_rule` — flags uses of `print()` intended to discourage debug-only printing in production code.
+### Wrap with Padding
 
-## Example
-
-Before (typical case):
-
+**Before:**
 ```dart
-// some_widget.dart
-final widget = MyComponent(child: Text('Hello'));
+final component = MyComponent(child: Text('Hello'));
 ```
 
-After invoking the "Wrap with Padding" assist (editor command palette / quick fix):
-
+**After:** Invoke "Wrap with Padding" assist
 ```dart
-final widget = Padding(
+final component = Padding(
   padding: const EdgeInsets.all(8),
   child: MyComponent(child: Text('Hello')),
 );
 ```
 
-Use the editor's quick-fix shortcut (`Cmd+.` on macOS or `Ctrl+.` on Windows/Linux) to see available assists when the caret is on a Nocterm component.
+### Convert to Stateless Component
 
-## Configuration
-
-You can enable or disable diagnostics from the plugin in `analysis_options.yaml`:
-
-```yaml
-plugins:
-  nocterm_lints:
-    path: ../packages/nocterm_lints
-    diagnostics:
-      no_print_rule: true
-```
-
-When published, the package also exposes `recommended.yaml` which you can `include:` to get sensible defaults.
-
-## Development
-
-This repository uses the `analysis_server_plugin` framework and follows the Rabbit Project conventions.
-
-Clone the repository and bootstrap workspace dependencies (monorepo root):
-
-```bash
-melos bootstrap
-```
-
-From the package directory you can run tests and format code:
-
-```bash
-dart pub get
-dart test
-dart format .
-```
-
-If you are developing the plugin and want to test it against a local project, add it to that project's `analysis_options.yaml` using a `path:` pointing to this package, then restart the analysis server.
-
-## Testing
-
-Unit tests for assists and rules live under the `test/` directory. Run them with `dart test` from the package root. Tests exercise assist generation and expected source edits.
-
-## Compatibility & Requirements
-
-- Dart SDK >= 3.11.0
-- `analysis_server_plugin` (used by the plugin) compatible with Dart 3.10+
-
-## Where to look next
-
-- Source: `lib/src/nocterm_lints_plugin.dart` — plugin entry point.
-- Assists: `lib/src/assists.dart` and `lib/src/assists/` — individual assist implementations.
-- Rules: `lib/src/rules.dart` — diagnostics and lint rule registrations.
-
-### Adding rules (optional)
-
-Rules are optional and may live in `lib/src/rules.dart`. When present, implement rules by extending `AnalysisRule` and register them from the plugin `register` method with `registry.registerLintRule(...)` or `registry.registerWarningRule(...)`.
-
-Minimal example for `lib/src/rules.dart`:
-
+**Before:**
 ```dart
-import 'package:analysis_server_plugin/plugin/registry.dart';
-import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analysis_server_plugin/utilities/rule.dart';
-
-class NoPrintRule extends AnalysisRule {
-  static const code = LintCode('no_print_rule', 'Avoid using print() in production.');
-
-  NoPrintRule() : super(code: code, message: 'Avoid using print()');
-
+class MyComponent extends StatefulComponent {
   @override
-  void registerNodeProcessors(RuleVisitorRegistry registry, RuleContext context) {
-    registry.addVisitor((node) {
-      if (node is MethodInvocation && node.methodName.name == 'print') {
-        rule.reportAtNode(node);
-      }
-    });
-  }
+  State<MyComponent> createState() => _MyComponentState();
+}
+
+class _MyComponentState extends State<MyComponent> {
+  @override
+  Component build(BuildContext context) => Text('Hello');
 }
 ```
 
-Register the rule from `lib/src/nocterm_lints_plugin.dart`:
-
+**After:** Invoke "Convert to Stateless Component" assist
 ```dart
-registry.registerLintRule(NoPrintRule());
+class MyComponent extends StatelessComponent {
+  const MyComponent({super.key});
+
+  @override
+  Component build(BuildContext context) => Text('Hello');
+}
 ```
 
-Enable the lint in a project's `analysis_options.yaml` under the plugin name:
+## Configuration
+
+Enable or disable diagnostics in `analysis_options.yaml`:
 
 ```yaml
 plugins:
   nocterm_lints:
-    diagnostics:
-      no_print_rule: true
+    path: ../nocterm_lints
 ```
 
-This README intentionally leaves the package without built-in rules. If you want, I can add the example `NoPrintRule` implementation into `lib/src/rules.dart` and re-enable its registration — say the word and I'll add it.
+## Development
+
+### Setup
+
+Bootstrap dependencies:
+```bash
+dart pub get
+```
+
+### Run Tests
+
+```bash
+dart test
+```
+
+### Format Code
+
+```bash
+dart format .
+```
+
+### Analyze
+
+```bash
+dart analyze
+```
+
+### Test Against Local Project
+
+1. Add to test project's `analysis_options.yaml`:
+   ```yaml
+   plugins:
+     nocterm_lints:
+       path: /path/to/nocterm_lints
+   ```
+
+2. Restart the Dart Analysis Server
+
+## Project Structure
+
+```
+nocterm_lints/
+├── lib/
+│   ├── main.dart                 # Plugin entry point
+│   ├── nocterm/                  # Individual assists
+│   │   ├── nocterm_wrap_*.dart
+│   │   ├── nocterm_move_*.dart
+│   │   ├── nocterm_convert_*.dart
+│   │   └── ...
+│   ├── services/                 # Core services
+│   └── utilities/                # Shared extensions
+├── test/                         # Unit tests
+├── example/                      # Example project
+├── analysis_options.yaml
+├── pubspec.yaml
+└── recommended.yaml              # Default lint config
+```
+
+## Requirements
+
+| Requirement | Version |
+|-------------|---------|
+| Dart SDK | >= 3.10.0 |
+| analysis_server_plugin | ^0.3.4 |
+| analyzer | >= 8.0.0, < 10.0.0 |
+
+## Supported Editors
+
+- VS Code (via Dart extension)
+- IntelliJ IDEA
+- Android Studio
+- Other Dart analyzer-compatible editors
+
+## Licensing
+
+Dual-licensed for compatibility:
+
+- **New code**: [MIT License](LICENSE)
+- **Derived from Dart SDK**: [BSD-3-Clause License](https://github.com/dart-lang/sdk/blob/main/LICENSE)
+
+See [ACKNOWLEDGMENTS.md](ACKNOWLEDGMENTS.md) and [LICENSE](LICENSE) for detailed attribution.

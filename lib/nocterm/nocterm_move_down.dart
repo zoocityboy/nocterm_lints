@@ -1,0 +1,56 @@
+// Copyright (c) 2020, the Dart project authors.
+// Copyright (c) 2026, zoocityboy.
+// Use of this source code is governed by a BSD-3-Clause license.
+// See LICENSE file for details.
+
+import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
+import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer_plugin/protocol/protocol_common.dart';
+import 'package:analyzer_plugin/utilities/assist/assist.dart';
+import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
+import 'package:analyzer_plugin/utilities/range_factory.dart';
+
+import '../services/correction/assist.dart';
+import '../utilities/extensions/nocterm.dart';
+
+class NoctermMoveDown extends ResolvedCorrectionProducer {
+  NoctermMoveDown({required super.context});
+
+  @override
+  CorrectionApplicability get applicability =>
+      CorrectionApplicability.singleLocation;
+
+  @override
+  AssistKind get assistKind => DartAssistKind.noctermMoveDown;
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    var widget = node.findComponentExpression;
+    if (widget == null) {
+      return;
+    }
+
+    var parentList = widget.parent;
+    if (parentList is ListLiteral) {
+      List<CollectionElement> parentElements = parentList.elements;
+      var index = parentElements.indexOf(widget);
+      if (index != parentElements.length - 1) {
+        await builder.addDartFileEdit(file, (fileBuilder) {
+          var nextWidget = parentElements[index + 1];
+          var nextRange = range.node(nextWidget);
+          var nextText = utils.getRangeText(nextRange);
+
+          var widgetRange = range.node(widget);
+          var widgetText = utils.getRangeText(widgetRange);
+
+          fileBuilder.addSimpleReplacement(nextRange, widgetText);
+          fileBuilder.addSimpleReplacement(widgetRange, nextText);
+
+          var lengthDelta = nextRange.length - widgetRange.length;
+          var newWidgetOffset = nextRange.offset + lengthDelta;
+          builder.setSelection(Position(file, newWidgetOffset));
+        });
+      }
+    }
+  }
+}

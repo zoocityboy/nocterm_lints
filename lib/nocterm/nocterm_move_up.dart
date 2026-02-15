@@ -1,0 +1,57 @@
+// Copyright (c) 2020, the Dart project authors.
+// Copyright (c) 2026, zoocityboy.
+// Use of this source code is governed by a BSD-3-Clause license.
+// See LICENSE file for details.
+
+import '../services/correction/assist.dart';
+import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
+import 'package:analyzer/dart/ast/ast.dart';
+// import '../utilities/extensions/flutter.dart';
+import 'package:analyzer_plugin/protocol/protocol_common.dart';
+import 'package:analyzer_plugin/utilities/assist/assist.dart';
+import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
+import 'package:analyzer_plugin/utilities/range_factory.dart';
+
+import '../utilities/extensions/nocterm.dart';
+
+class NoctermMoveUp extends ResolvedCorrectionProducer {
+  NoctermMoveUp({required super.context});
+
+  @override
+  CorrectionApplicability get applicability =>
+      // TODO(applicability): comment on why.
+      CorrectionApplicability.singleLocation;
+
+  @override
+  AssistKind get assistKind => DartAssistKind.noctermMoveUp;
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    var widget = node.findComponentExpression;
+    if (widget == null) {
+      return;
+    }
+
+    var parentList = widget.parent;
+    if (parentList is ListLiteral) {
+      List<CollectionElement> parentElements = parentList.elements;
+      var index = parentElements.indexOf(widget);
+      if (index > 0) {
+        await builder.addDartFileEdit(file, (fileBuilder) {
+          var previousWidget = parentElements[index - 1];
+          var previousRange = range.node(previousWidget);
+          var previousText = utils.getRangeText(previousRange);
+
+          var widgetRange = range.node(widget);
+          var widgetText = utils.getRangeText(widgetRange);
+
+          fileBuilder.addSimpleReplacement(previousRange, widgetText);
+          fileBuilder.addSimpleReplacement(widgetRange, previousText);
+
+          var newWidgetOffset = previousRange.offset;
+          builder.setSelection(Position(file, newWidgetOffset));
+        });
+      }
+    }
+  }
+}
