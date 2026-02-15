@@ -1,3 +1,7 @@
+# 0.3.0+dev.1
+  
+- **chore**: wrong format of tag versions
+
 # 0.2.0-dev.2
 
 - **chore**: typo
