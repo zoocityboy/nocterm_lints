@@ -82,7 +82,7 @@ extension AstNodeExtension on AstNode? {
   }
 
   /// Attempts to find and return the closest expression that encloses this
-  /// and is an independent Flutter `Component`.
+  /// and is an independent Nocterm `Component`.
   ///
   /// Returns `null` if nothing is found.
   Expression? get findComponentExpression {
@@ -139,7 +139,7 @@ extension AstNodeExtension on AstNode? {
   }
 
   /// Finds the named expression whose name is the given [name] that is an
-  /// argument to a Flutter instance creation expression.
+  /// argument to a nocterm instance creation expression.
   ///
   /// Returns `null` if this is not a [SimpleIdentifier], or if any other
   /// condition cannot be satisfied.
@@ -167,20 +167,20 @@ extension AstNodeExtension on AstNode? {
 }
 
 extension ClassElementExtension2 on ClassElement {
-  /// Whether this is the Flutter class `State`.
+  /// Whether this is the Nocterm class `State`.
   bool get isExactState => _isExactly(_nameState, _uriFramework);
 
-  /// Whether this has the Flutter class `State` as a superclass.
+  /// Whether this has the Nocterm class `State` as a superclass.
   bool get isState => _hasSupertype(_uriFramework, _nameState);
 
-  /// Whether this is a [ClassElement] that extends the Flutter class
+  /// Whether this is a [ClassElement] that extends the Nocterm class
   /// `StatefulWidget`.
   bool get isStatefulComponentDeclaration =>
       supertype.isExactlyStatefulComponentType;
 }
 
 extension DartTypeExtension on DartType? {
-  /// Whether this is the Flutter type `BuildContext`.
+  /// Whether this is the Nocterm type `BuildContext`.
   bool get isBuildContext {
     final self = this;
     return self is InterfaceType &&
@@ -200,84 +200,84 @@ extension DartTypeExtension on DartType? {
     );
   }
 
-  /// Whether this is the Flutter type `EdgeInsetsGeometry`.
+  /// Whether this is the Nocterm type `EdgeInsetsGeometry`.
   bool get isExactEdgeInsetsGeometryType {
     final self = this;
     return self is InterfaceType &&
         self.element._isExactly('EdgeInsetsGeometry', _uriEdgeInsets);
   }
 
-  /// Whether this is the Flutter class `StatefulWidget`.
+  /// Whether this is the Nocterm class `StatefulWidget`.
   bool get isExactlyStatefulComponentType {
     final self = this;
     return self is InterfaceType &&
         self.element._isExactly(_nameStatefulComponent, _uriFramework);
   }
 
-  /// Whether this is the Flutter class `StatelessWidget`.
+  /// Whether this is the Nocterm class `StatelessWidget`.
   bool get isExactlyStatelessComponentType {
     final self = this;
     return self is InterfaceType &&
         self.element._isExactly(_nameStatelessComponent, _uriFramework);
   }
 
-  /// Whether this is the Flutter class `Align`.
+  /// Whether this is the Nocterm class `Align`.
   bool get isExactComponentTypeAlign {
     final self = this;
     return self is InterfaceType &&
         self.element._isExactly(_nameAlign, _uriBasic);
   }
 
-  /// Whether this is the Flutter class `Builder`.
+  /// Whether this is the Nocterm class `Builder`.
   bool get isExactComponentTypeBuilder {
     final self = this;
     return self is InterfaceType &&
         self.element._isExactly(_nameBuilder, _uriBasic);
   }
 
-  /// Whether this is the Flutter class `Center`.
+  /// Whether this is the Nocterm class `Center`.
   bool get isExactComponentTypeCenter {
     final self = this;
     return self is InterfaceType &&
         self.element._isExactly(_nameCenter, _uriBasic);
   }
 
-  /// Whether this is the Flutter class `Container`.
+  /// Whether this is the Nocterm class `Container`.
   bool get isExactComponentTypeContainer {
     final self = this;
     return self is InterfaceType &&
         self.element._isExactly(_nameContainer, _uriContainer);
   }
 
-  /// Whether this is the Flutter class `Expanded`.
+  /// Whether this is the Nocterm class `Expanded`.
   bool get isExactComponentTypeExpanded {
     final self = this;
     return self is InterfaceType &&
         self.element._isExactly(_nameExpanded, _uriBasic);
   }
 
-  /// Whether this is the Flutter class `Flexible`.
+  /// Whether this is the Nocterm class `Flexible`.
   bool get isExactComponentTypeFlexible {
     final self = this;
     return self is InterfaceType &&
         self.element._isExactly(_nameFlexible, _uriBasic);
   }
 
-  /// Whether this is the Flutter class `Padding`.
+  /// Whether this is the Nocterm class `Padding`.
   bool get isExactComponentTypePadding {
     final self = this;
     return self is InterfaceType &&
         self.element._isExactly(_namePadding, _uriBasic);
   }
 
-  /// Whether this is the Flutter class `SizedBox`.
+  /// Whether this is the Nocterm class `SizedBox`.
   bool get isExactComponentTypeSizedBox {
     final self = this;
     return self is InterfaceType &&
         self.element._isExactly(_nameSizedBox, _uriBasic);
   }
 
-  /// Whether this is the Flutter class `Widget`, or its subtype.
+  /// Whether this is the Nocterm class `Widget`, or its subtype.
   bool get isListOfWidgetsType {
     final self = this;
     return self is InterfaceType &&
@@ -300,9 +300,9 @@ extension DartTypeExtension on DartType? {
     );
   }
 
-  /// Whether this is a function type matching the Flutter typedef
-  /// `WidgetBuilder` (i.e., `Widget Function(BuildContext context)`).
-  bool get isWidgetBuilder {
+  /// Whether this is a function type matching the Nocterm typedef
+  /// `ComponentBuilder` (i.e., `Component Function(BuildContext context)`).
+  bool get isComponentBuilder {
     final self = this;
     return self is FunctionType &&
         self.returnType.isComponentType &&
@@ -335,18 +335,6 @@ extension ExpressionExtension on Expression {
     final self = this;
     return self is NamedExpression && self.name.label.name == 'children';
   }
-
-  /// Whether this is the `sliver` argument.
-  bool get isSliverArgument {
-    final self = this;
-    return self is NamedExpression && self.name.label.name == 'sliver';
-  }
-
-  /// Whether this is the `slivers` argument.
-  bool get isSliversArgument {
-    final self = this;
-    return self is NamedExpression && self.name.label.name == 'slivers';
-  }
 }
 
 extension InstanceCreationExpressionExtension on InstanceCreationExpression {
@@ -375,25 +363,12 @@ extension InstanceCreationExpressionExtension on InstanceCreationExpression {
 
   bool get isExactlyPaddingCreation => staticType.isExactComponentTypePadding;
 
-  /// Whether this is a constructor invocation for a class that has the Flutter
+  /// Whether this is a constructor invocation for a class that has the Nocterm
   /// class `Component` as a superclass.
   bool get isComponentCreation {
     final element = constructorName.element?.enclosingElement;
     return element.isComponent;
   }
-
-  /// The named expression representing
-  /// the `sliver` argument, or `null` if there
-  /// is none.
-  NamedExpression? get sliverArgument => argumentList.arguments
-      .whereType<NamedExpression>()
-      .firstWhereOrNull((argument) => argument.isSliverArgument);
-
-  /// The named expression representing the `slivers` argument, or `null` if
-  /// there is none.
-  NamedExpression? get sliversArgument => argumentList.arguments
-      .whereType<NamedExpression>()
-      .firstWhereOrNull((argument) => argument.isSliversArgument);
 
   /// The presentation for this node.
   String? get widgetPresentationText {
@@ -425,7 +400,7 @@ extension InstanceCreationExpressionExtension on InstanceCreationExpression {
 }
 
 extension InterfaceElement2Extension on InterfaceElement? {
-  /// Whether this is the Flutter class `Flex`, or a subtype.
+  /// Whether this is the Nocterm class `Flex`, or a subtype.
   bool get isFlexWidget {
     final self = this;
     if (self is! ClassElement) {
@@ -444,22 +419,22 @@ extension InterfaceElement2Extension on InterfaceElement? {
 }
 
 extension InterfaceElementExtension2 on InterfaceElement? {
-  /// Whether this is the Flutter class `Alignment`.
+  /// Whether this is the Nocterm class `Alignment`.
   bool get isExactAlignment {
     return _isExactly('Alignment', _uriAlignment);
   }
 
-  /// Whether this is the Flutter class `AlignmentDirectional`.
+  /// Whether this is the Nocterm class `AlignmentDirectional`.
   bool get isExactAlignmentDirectional {
     return _isExactly('AlignmentDirectional', _uriAlignment);
   }
 
-  /// Whether this is the Flutter class `AlignmentGeometry`.
+  /// Whether this is the Nocterm class `AlignmentGeometry`.
   bool get isExactAlignmentGeometry {
     return _isExactly('AlignmentGeometry', _uriAlignment);
   }
 
-  /// Whether this is the Flutter class `Component`, or a subtype.
+  /// Whether this is the Nocterm class `Component`, or a subtype.
   bool get isComponent {
     final self = this;
     if (self is! ClassElement) {
@@ -494,7 +469,7 @@ extension InterfaceElementExtension2 on InterfaceElement? {
   /// Whether this is the exact [type] defined in the file with the given [uri].
   bool _isExactly(String type, Uri uri) {
     final self = this;
-    log('isExactly: $self, $type, $uri');
+
     return self is ClassElement && self.name == type && self.library.uri == uri;
   }
 }

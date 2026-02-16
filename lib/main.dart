@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:analysis_server_plugin/plugin.dart';
 import 'package:analysis_server_plugin/registry.dart';
 
@@ -29,31 +31,39 @@ class NoctermLintsPlugin extends Plugin {
 
   @override
   void register(PluginRegistry registry) {
-    /// Widget manipulation assists
-    registry.registerAssist(MoveDown.new);
-    registry.registerAssist(MoveUp.new);
-    registry.registerAssist(RemoveWidget.new);
-    registry.registerAssist(SwapWithChild.new);
-    registry.registerAssist(SwapWithParent.new);
+    try {
+      /// Widget manipulation assists
+      registry.registerAssist(MoveDown.new);
+      registry.registerAssist(MoveUp.new);
+      registry.registerAssist(RemoveWidget.new);
+      registry.registerAssist(SwapWithChild.new);
+      registry.registerAssist(SwapWithParent.new);
 
-    /// Component wrapping assists
-    registry.registerAssist(WrapComponent.new);
-    registry.registerAssist(WrapGeneric.new);
-    registry.registerAssist(WrapCenter.new);
-    registry.registerAssist(WrapContainer.new);
-    registry.registerAssist(WrapExpanded.new);
-    registry.registerAssist(WrapFlexible.new);
-    registry.registerAssist(WrapPadding.new);
-    registry.registerAssist(WrapSizedBox.new);
-    registry.registerAssist(WrapRow.new);
-    registry.registerAssist(WrapColumn.new);
+      /// Component wrapping assists
+      registry.registerAssist(WrapComponent.new);
+      registry.registerAssist(WrapGeneric.new);
+      registry.registerAssist(WrapCenter.new);
+      registry.registerAssist(WrapContainer.new);
+      registry.registerAssist(WrapExpanded.new);
+      registry.registerAssist(WrapFlexible.new);
+      registry.registerAssist(WrapPadding.new);
+      registry.registerAssist(WrapSizedBox.new);
+      registry.registerAssist(WrapRow.new);
+      registry.registerAssist(WrapColumn.new);
 
-    /// Builder wrap assists
-    registry.registerAssist(WrapBuilder.new);
-    registry.registerAssist(WrapValueListenableBuilder.new);
+      /// Builder wrap assists
+      registry.registerAssist(WrapBuilder.new);
+      registry.registerAssist(WrapValueListenableBuilder.new);
 
-    /// Widget conversion assists
-    // registry.registerAssist(ConvertToStatefulWidget.new);
-    // registry.registerAssist(ConvertToStatelessWidget.new);
+      /// Widget conversion assists
+      registry.registerAssist(ConvertToStatefulWidget.new);
+      registry.registerAssist(ConvertToStatelessWidget.new);
+    } catch (e, stackTrace) {
+      log(
+        '[nocterm_lints] registering assists: $e',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
   }
 }

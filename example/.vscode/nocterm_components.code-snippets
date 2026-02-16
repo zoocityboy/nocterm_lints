@@ -1,0 +1,37 @@
+{
+	".source.dart": {
+		"Nocterm Stateless Component": {
+			"prefix": "nstless",
+			"description": "Insert a StatelessComponent",
+			"body": [
+				"class $1 extends StatelessComponent {",
+				"  const $1({ Key? key }) : super(key: key);",
+				"",
+				"  @override",
+				"  Component build(BuildContext context) {",
+				"    return ${0:const SizedBox.shrink()};",
+				"  }",
+				"}"
+			]
+		},
+		"Nocterm Stateful Component": {
+			"prefix": "nstful",
+			"description": "Insert a StatefulComponent",
+			"body": [
+				"class $1 extends StatefulComponent {",
+				"  const $1({ Key? key }) : super(key: key);",
+				"",
+				"  @override",
+				"  State<$1> createState() => _$1State();",
+				"}",
+				"",
+				"class _$1State extends State<$1> {",
+				"  @override",
+				"  Component build(BuildContext context) {",
+				"    return ${0:const SizedBox.shrink()};",
+				"  }",
+				"}"
+			]
+		}
+	}
+}

@@ -14,7 +14,7 @@ analyzer:
     record_literal_one_positional_no_trailing_comma: error
     implementation_imports: ignore
     cascade_invocations: ignore
-    experimental_member_use: ignore
+    experimental_member_use: info
     avoid_positional_boolean_parameters: ignore
     avoid_catches_without_on_clauses: ignore
     dangling_library_doc_comments: ignore

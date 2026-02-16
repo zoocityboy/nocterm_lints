@@ -46,18 +46,6 @@ class RemoveWidget extends ResolvedCorrectionProducer {
       await _removeSingle(builder, widgetCreation, childArgument.expression);
     } else if (widgetCreation.builderArgument case final builderArgument?) {
       await _removeBuilder(builder, widgetCreation, builderArgument);
-    } else if (widgetCreation.sliversArgument case final sliversArgument?) {
-      final sliversExpression = sliversArgument.expression;
-      if (sliversExpression is ListLiteral &&
-          sliversExpression.elements.isNotEmpty) {
-        await _removeChildren(
-          builder,
-          widgetCreation,
-          sliversExpression.elements,
-        );
-      }
-    } else if (widgetCreation.sliverArgument case final sliverArgument?) {
-      await _removeSingle(builder, widgetCreation, sliverArgument.expression);
     } else {
       await _removeSingleWhenInList(builder, widgetCreation);
     }
