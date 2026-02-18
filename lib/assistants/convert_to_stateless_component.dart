@@ -36,22 +36,24 @@ class ConvertToStatelessComponent extends ResolvedCorrectionProducer {
   @override
   Future<void> compute(ChangeBuilder builder) async {
     logInfo('Starting assist: Convert to StatelessComponent');
-    var componentClass = node.thisOrAncestorOfType<ClassDeclaration>();
-    var superclass = componentClass?.extendsClause?.superclass;
+    final componentClass = node.thisOrAncestorOfType<ClassDeclaration>();
+    final superclass = componentClass?.extendsClause?.superclass;
     logInfo(
-      'Found component class: ${componentClass?.name.lexeme}, superclass: ${superclass?.name.lexeme}',
+      'Found component class: ${componentClass?.name.lexeme}, '
+      'superclass: ${superclass?.name.lexeme}',
     );
     if (componentClass == null || superclass == null) {
       logError(
-        '${this.runtimeType}: No class declaration or superclass found at offset $selectionOffset',
+        ' No class declaration or superclass found at offset $selectionOffset',
       );
       return;
     }
     // useDeclaringConstructorsAst = true;
-    var componentClassBody = componentClass.body;
+    final componentClassBody = componentClass.body;
     if (componentClassBody is! BlockClassBody) {
       logError(
-        '${this.runtimeType}: Component class body is not a block ${componentClassBody.runtimeType}',
+        ' Component class body is not a '
+        'block ${componentClassBody.runtimeType}',
       );
       return;
     }
@@ -60,90 +62,94 @@ class ConvertToStatelessComponent extends ResolvedCorrectionProducer {
     if (selectionOffset < componentClass.classKeyword.offset ||
         selectionOffset > componentClassBody.leftBracket.end) {
       logError(
-        '${this.runtimeType}: Selection is outside the component class body',
+        ' Selection is outside the component class body',
       );
       return;
     }
 
     // Must be a StatefulComponent subclass.
-    var componentClassFragment = componentClass.declaredFragment!;
-    var componentClassElement = componentClassFragment.element;
-    var superType = componentClassElement.supertype;
+    final componentClassFragment = componentClass.declaredFragment!;
+    final componentClassElement = componentClassFragment.element;
+    final superType = componentClassElement.supertype;
     if (superType == null || !superType.isExactlyStatefulComponentType) {
       logError(
-        '${this.runtimeType}: Component class is not a StatefulComponent subclass',
+        ' Component class is not a StatefulComponent subclass',
       );
       return;
     }
 
-    var createStateMethod = _findCreateStateMethod(componentClass);
+    final createStateMethod = _findCreateStateMethod(componentClass);
     if (createStateMethod == null) return;
 
-    var stateClass = _findStateClass(componentClassElement);
-    var stateClassElement = stateClass?.declaredFragment!.element;
+    final stateClass = _findStateClass(componentClassElement);
+    final stateClassElement = stateClass?.declaredFragment!.element;
     if (stateClass == null ||
         stateClassElement == null ||
         !Identifier.isPrivateName(stateClass.namePart.typeName.lexeme) ||
         !_isSameTypeParameters(componentClass, stateClass)) {
-      logError('${this.runtimeType}: State class is not valid');
+      logError(' State class is not valid');
       return;
     }
 
-    var verifier = _StatelessVerifier();
-    var fieldFinder = _FieldFinder();
+    final verifier = _StatelessVerifier();
+    final fieldFinder = _FieldFinder();
 
-    for (var member in stateClass.members2) {
+    for (final member in stateClass.members2) {
       if (member is ConstructorDeclaration) {
         member.accept(fieldFinder);
       } else if (member is MethodDeclaration) {
         member.accept(verifier);
         if (!verifier.canBeStateless) {
           logError(
-            '${this.runtimeType}: State class cannot be converted to StatelessComponent',
+            ' State class cannot be converted to StatelessComponent',
           );
           return;
         }
       }
     }
 
-    var usageVerifier = _StateUsageVisitor(
+    final usageVerifier = _StateUsageVisitor(
       componentClassElement,
       stateClassElement,
     );
     unit.visitChildren(usageVerifier);
     if (usageVerifier.used) {
       logError(
-        '${this.runtimeType}: State class is used in a way that prevents conversion to StatelessComponent',
+        ' State class is used in a way that prevents'
+        ' conversion to StatelessComponent',
       );
       return;
     }
 
-    var fieldsAssignedInConstructors = fieldFinder.fieldsAssignedInConstructors;
+    final fieldsAssignedInConstructors =
+        fieldFinder.fieldsAssignedInConstructors;
 
     // Prepare nodes to move.
-    var nodesToMove = <ClassMember>[];
-    var elementsToMove = <Element>{};
-    for (var member in stateClass.members2) {
+    final nodesToMove = <ClassMember>[];
+    final elementsToMove = <Element>{};
+    for (final member in stateClass.members2) {
       if (member is FieldDeclaration) {
         if (member.isStatic) {
           logWarning(
-            '${this.runtimeType}: Static members cannot be moved to StatelessComponent and will be skipped: ${member.fields.variables.map((v) => v.name.lexeme).join(', ')}',
+            ' Static members cannot be moved to StatelessComponent '
+            ' and will be skipped: '
+            '${member.fields.variables.map((v) => v.name.lexeme).join(', ')}',
           );
           return;
         }
-        for (var fieldNode in member.fields.variables) {
-          var fieldElement =
+        for (final fieldNode in member.fields.variables) {
+          final fieldElement =
               fieldNode.declaredFragment!.element as FieldElement;
           if (!fieldsAssignedInConstructors.contains(fieldElement)) {
             nodesToMove.add(member);
             elementsToMove.add(fieldElement);
 
-            var getter = fieldElement.getter;
+            final getter = fieldElement.getter;
             if (getter != null) {
               elementsToMove.add(getter);
             }
 
-            var setter = fieldElement.setter;
+            final setter = fieldElement.setter;
             if (setter != null) {
               elementsToMove.add(setter);
             }
@@ -152,7 +158,8 @@ class ConvertToStatelessComponent extends ResolvedCorrectionProducer {
       } else if (member is MethodDeclaration) {
         if (member.isStatic) {
           logWarning(
-            '${this.runtimeType}: Static members cannot be moved to StatelessComponent and will be skipped: ${member.name.lexeme}',
+            ' Static members cannot be moved to StatelessComponent and will'
+            ' be skipped: ${member.name.lexeme}',
           );
           return;
         }
@@ -167,11 +174,11 @@ class ConvertToStatelessComponent extends ResolvedCorrectionProducer {
     /// references to the widget (`widget.` or static `MyComponentClass.`)
     /// is removed
     String rewriteComponentMemberReferences(AstNode movedNode) {
-      var linesRange = utils.getLinesRange(range.node(movedNode));
-      var text = utils.getRangeText(linesRange);
+      final linesRange = utils.getLinesRange(range.node(movedNode));
+      final text = utils.getRangeText(linesRange);
 
       // Remove `widget.` before references to the widget instance members.
-      var visitor = _ReplacementEditBuilder(
+      final visitor = _ReplacementEditBuilder(
         componentClassElement,
         elementsToMove,
         linesRange,
@@ -180,12 +187,12 @@ class ConvertToStatelessComponent extends ResolvedCorrectionProducer {
       return SourceEdit.applySequence(text, visitor.edits.reversed.toList());
     }
 
-    var statelessComponentClass = await getNoctermClass(
+    final statelessComponentClass = await getNoctermClass(
       sessionHelper,
       'StatelessComponent',
     );
     if (statelessComponentClass == null) {
-      logError('${this.runtimeType}: Could not find StatelessComponent class');
+      logError(' Could not find StatelessComponent class');
       return;
     }
 
@@ -199,24 +206,25 @@ class ConvertToStatelessComponent extends ResolvedCorrectionProducer {
       var createStateNextToEnd = createStateMethod.endToken.next!;
       createStateNextToEnd =
           createStateNextToEnd.precedingComments ?? createStateNextToEnd;
-      var createStateRange = range.startOffsetEndOffset(
+      final createStateRange = range.startOffsetEndOffset(
         utils.getLineContentStart(createStateMethod.offset),
         utils.getLineContentStart(createStateNextToEnd.offset),
       );
 
-      var newLine = createStateNextToEnd.type != TokenType.CLOSE_CURLY_BRACKET;
+      final newLine =
+          createStateNextToEnd.type != TokenType.CLOSE_CURLY_BRACKET;
 
       builder.addReplacement(createStateRange, (builder) {
         for (var i = 0; i < nodesToMove.length; i++) {
-          var member = nodesToMove[i];
-          var comments = member.beginToken.precedingComments;
+          final member = nodesToMove[i];
+          final comments = member.beginToken.precedingComments;
           if (comments != null) {
-            var offset = utils.getLineContentStart(comments.offset);
-            var length = comments.end - offset;
+            final offset = utils.getLineContentStart(comments.offset);
+            final length = comments.end - offset;
             builder.writeln(utils.getText(offset, length));
           }
 
-          var text = rewriteComponentMemberReferences(member);
+          final text = rewriteComponentMemberReferences(member);
           builder.write(text);
           if (newLine || i < nodesToMove.length - 1) {
             builder.writeln();
@@ -227,30 +235,30 @@ class ConvertToStatelessComponent extends ResolvedCorrectionProducer {
   }
 
   MethodDeclaration? _findCreateStateMethod(ClassDeclaration componentClass) {
-    for (var member in componentClass.members2) {
+    for (final member in componentClass.members2) {
       if (member is MethodDeclaration && member.name.lexeme == 'createState') {
-        var parameters = member.parameters;
+        final parameters = member.parameters;
         if (parameters?.parameters.isEmpty ?? false) {
           return member;
         }
         break;
       }
     }
-    logError('${this.runtimeType}: Could not find createState method');
+    logError(' Could not find createState method');
     return null;
   }
 
   ClassDeclaration? _findStateClass(ClassElement componentClassElement) {
-    for (var declaration in unit.declarations) {
+    for (final declaration in unit.declarations) {
       if (declaration is ClassDeclaration) {
-        var type = declaration.extendsClause?.superclass.type;
+        final type = declaration.extendsClause?.superclass.type;
 
         if (_isState(componentClassElement, type)) {
           return declaration;
         }
       }
     }
-    logError('${this.runtimeType}: Could not find State class');
+    logError(' Could not find State class');
     return null;
   }
 
@@ -261,8 +269,8 @@ class ConvertToStatelessComponent extends ResolvedCorrectionProducer {
     List<TypeParameter>? parameters(ClassDeclaration declaration) =>
         declaration.namePart.typeParameters?.typeParameters;
 
-    var widgetParams = parameters(componentClass);
-    var stateParams = parameters(stateClass);
+    final widgetParams = parameters(componentClass);
+    final stateParams = parameters(stateClass);
 
     if (widgetParams == null && stateParams == null) {
       logError('Both widget and state classes have no type parameters');
@@ -274,13 +282,14 @@ class ConvertToStatelessComponent extends ResolvedCorrectionProducer {
     }
     if (widgetParams.length < stateParams.length) {
       logError(
-        'State class has more type parameters than widget class, which is not supported',
+        'State class has more type parameters than widget class, '
+        'which is not supported',
       );
       return false;
     }
     outer:
-    for (var stateParam in stateParams) {
-      for (var widgetParam in widgetParams) {
+    for (final stateParam in stateParams) {
+      for (final widgetParam in widgetParams) {
         if (stateParam.name.lexeme == widgetParam.name.lexeme &&
             stateParam.bound?.type == widgetParam.bound?.type) {
           continue outer;
@@ -293,14 +302,14 @@ class ConvertToStatelessComponent extends ResolvedCorrectionProducer {
   }
 
   static bool _isDefaultOverride(MethodDeclaration? methodDeclaration) {
-    var body = methodDeclaration?.body;
+    final body = methodDeclaration?.body;
     if (body != null) {
       Expression expression;
       if (body is BlockFunctionBody) {
-        var statements = body.block.statements;
+        final statements = body.block.statements;
         if (statements.isEmpty) return true;
         if (statements.length > 1) return false;
-        var first = statements.first;
+        final first = statements.first;
         if (first is! ExpressionStatement) return false;
         expression = first.expression;
       } else if (body is ExpressionFunctionBody) {
@@ -321,13 +330,13 @@ class ConvertToStatelessComponent extends ResolvedCorrectionProducer {
   static bool _isState(ClassElement componentClassElement, DartType? type) {
     if (type is! InterfaceType) return false;
 
-    var firstArgument = type.typeArguments.singleOrNull;
+    final firstArgument = type.typeArguments.singleOrNull;
     if (firstArgument is! InterfaceType ||
         firstArgument.element != componentClassElement) {
       return false;
     }
 
-    var classElement = type.element;
+    final classElement = type.element;
     return classElement is ClassElement && classElement.isExactState;
   }
 }
@@ -338,24 +347,24 @@ class _FieldFinder extends RecursiveAstVisitor<void> {
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
     if (node.parent is FieldFormalParameter) {
-      var element = node.element;
+      final element = node.element;
       if (element is FieldFormalParameterElement) {
-        var field = element.field;
+        final field = element.field;
         if (field != null) {
           fieldsAssignedInConstructors.add(field);
         }
       }
     }
     if (node.parent is ConstructorFieldInitializer) {
-      var element = node.element;
+      final element = node.element;
       if (element is FieldElement) {
         fieldsAssignedInConstructors.add(element);
       }
     }
     if (node.inSetterContext()) {
-      var element = node.writeOrReadElement;
-      var field = switch (element) {
-        PropertyAccessorElement(:var variable) => variable,
+      final element = node.writeOrReadElement;
+      final field = switch (element) {
+        PropertyAccessorElement(:final variable) => variable,
         _ => null,
       };
       if (field is FieldElement) {
@@ -366,6 +375,11 @@ class _FieldFinder extends RecursiveAstVisitor<void> {
 }
 
 class _ReplacementEditBuilder extends RecursiveAstVisitor<void> {
+  _ReplacementEditBuilder(
+    this.componentClassElement,
+    this.elementsToMove,
+    this.linesRange,
+  );
   final ClassElement componentClassElement;
 
   final Set<Element> elementsToMove;
@@ -374,26 +388,20 @@ class _ReplacementEditBuilder extends RecursiveAstVisitor<void> {
 
   List<SourceEdit> edits = [];
 
-  _ReplacementEditBuilder(
-    this.componentClassElement,
-    this.elementsToMove,
-    this.linesRange,
-  );
-
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
     if (node.inDeclarationContext()) {
       return;
     }
-    var element = node.element;
+    final element = node.element;
     if (element is ExecutableElement &&
         element.enclosingElement == componentClassElement &&
         !elementsToMove.contains(element)) {
-      var parent = node.parent;
+      final parent = node.parent;
       if (parent is PrefixedIdentifier) {
-        var grandParent = parent.parent;
+        final grandParent = parent.parent;
         SourceEdit? rightBracketEdit;
-        if (!node.name.contains('\$') &&
+        if (!node.name.contains(r'$') &&
             grandParent is InterpolationExpression &&
             grandParent.leftBracket.type ==
                 TokenType.STRING_INTERPOLATION_EXPRESSION) {
@@ -404,31 +412,31 @@ class _ReplacementEditBuilder extends RecursiveAstVisitor<void> {
               '',
             ),
           );
-          var offset = grandParent.rightBracket?.offset;
+          final offset = grandParent.rightBracket?.offset;
           if (offset != null) {
             rightBracketEdit = SourceEdit(offset - linesRange.offset, 1, '');
           }
         }
-        var offset = parent.prefix.offset;
-        var length = parent.period.end - offset;
+        final offset = parent.prefix.offset;
+        final length = parent.period.end - offset;
         edits.add(SourceEdit(offset - linesRange.offset, length, ''));
         if (rightBracketEdit != null) {
           edits.add(rightBracketEdit);
         }
       } else if (parent is MethodInvocation) {
-        var target = parent.target;
-        var operator = parent.operator;
+        final target = parent.target;
+        final operator = parent.operator;
         if (target != null && operator != null) {
-          var offset = target.offset;
-          var length = operator.end - offset;
+          final offset = target.offset;
+          final length = operator.end - offset;
           edits.add(SourceEdit(offset - linesRange.offset, length, ''));
         }
       } else if (parent is PropertyAccess) {
-        var target = parent.target;
-        var operator = parent.operator;
+        final target = parent.target;
+        final operator = parent.operator;
         if (target != null) {
-          var offset = target.offset;
-          var length = operator.end - offset;
+          final offset = target.offset;
+          final length = operator.end - offset;
           edits.add(SourceEdit(offset - linesRange.offset, length, ''));
         }
       }
@@ -437,12 +445,12 @@ class _ReplacementEditBuilder extends RecursiveAstVisitor<void> {
 }
 
 class _StatelessVerifier extends RecursiveAstVisitor<void> {
-  var canBeStateless = true;
+  bool canBeStateless = true;
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    var methodElement = node.methodName.element?.baseElement;
-    var classElement = methodElement?.enclosingElement;
+    final methodElement = node.methodName.element?.baseElement;
+    final classElement = methodElement?.enclosingElement;
     if (classElement is ClassElement &&
         classElement.isExactState &&
         !ConvertToStatelessComponent._isDefaultOverride(
@@ -456,21 +464,20 @@ class _StatelessVerifier extends RecursiveAstVisitor<void> {
 }
 
 class _StateUsageVisitor extends RecursiveAstVisitor<void> {
+  _StateUsageVisitor(this.componentClassElement, this.stateClassElement);
   bool used = false;
   ClassElement componentClassElement;
   ClassElement stateClassElement;
 
-  _StateUsageVisitor(this.componentClassElement, this.stateClassElement);
-
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
     super.visitInstanceCreationExpression(node);
-    var type = node.staticType;
+    final type = node.staticType;
     if (type is! InterfaceType || type.element != stateClassElement) {
       return;
     }
-    var methodDeclaration = node.thisOrAncestorOfType<MethodDeclaration>();
-    var classDeclaration = methodDeclaration
+    final methodDeclaration = node.thisOrAncestorOfType<MethodDeclaration>();
+    final classDeclaration = methodDeclaration
         ?.thisOrAncestorOfType<ClassDeclaration>();
 
     if (methodDeclaration?.name.lexeme != 'createState' ||
@@ -481,7 +488,7 @@ class _StateUsageVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    var type = node.staticType;
+    final type = node.staticType;
     if (type is InterfaceType &&
         node.methodName.name == 'createState' &&
         (ConvertToStatelessComponent._isState(componentClassElement, type) ||

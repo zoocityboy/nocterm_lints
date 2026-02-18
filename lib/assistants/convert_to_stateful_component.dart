@@ -35,14 +35,14 @@ class ConvertToStatefulComponent extends ResolvedCorrectionProducer {
   Future<void> compute(ChangeBuilder builder) async {
     useDeclaringConstructorsAst = true;
     logInfo(
-      'ConvertToStatefulComponent: Computing assist at offset $selectionOffset',
+      'Computing assist at offset $selectionOffset',
     );
 
     final componentClass = node.thisOrAncestorOfType<ClassDeclaration>();
     final superclass = componentClass?.extendsClause?.superclass;
     if (componentClass == null || superclass == null) {
       logError(
-        'ConvertToStatefulComponent: No class declaration or superclass found at offset $selectionOffset',
+        'No class declaration or superclass found at offset $selectionOffset',
       );
       return;
     }
@@ -54,7 +54,7 @@ class ConvertToStatefulComponent extends ResolvedCorrectionProducer {
       }
     } catch (e, s) {
       logError(
-        'ConvertToStatefulComponent: Failed to analyze class body at offset $selectionOffset',
+        'Failed to analyze class body at offset $selectionOffset',
         e,
         s,
       );
@@ -145,11 +145,11 @@ class ConvertToStatefulComponent extends ResolvedCorrectionProducer {
       'StatefulComponent',
     );
     logInfo(
-      'ConvertToStatefulComponent: Found StatefulComponent class: ${statefulComponentClass != null}',
+      'Found StatefulComponent class: ${statefulComponentClass != null}',
     );
     final stateClass = await getNoctermClass(sessionHelper, 'State');
     logInfo(
-      'ConvertToStatefulComponent: Found State class: ${stateClass != null}',
+      'Found State class: ${stateClass != null}',
     );
     if (statefulComponentClass == null || stateClass == null) {
       return;

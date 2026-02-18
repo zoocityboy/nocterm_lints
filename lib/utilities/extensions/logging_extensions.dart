@@ -2,7 +2,10 @@
 // Use of this source code is governed by a BSD-3-Clause license.
 // See LICENSE file for details.
 
-import 'package:nocterm_lints/utilities/logger.dart';
+// Extension methods for logging analysis operations.
+// ignore_for_file: no_runtimetype_tostring
+
+import '../logger.dart';
 
 /// Extension methods for logging analysis operations.
 extension NoctermLogging on Object {
@@ -43,20 +46,26 @@ class AnalysisMetrics {
     String? reason,
   }) {
     if (!success && reason != null) {
-      _logger.debug('Assist $assistName skipped: $reason (${duration.inMilliseconds}ms)');
+      _logger.debug(
+        'Assist $assistName skipped: $reason (${duration.inMilliseconds}ms)',
+      );
     } else if (success) {
-      _logger.info('Assist $assistName executed (${duration.inMilliseconds}ms)');
+      _logger.info(
+        'Assist $assistName executed (${duration.inMilliseconds}ms)',
+      );
     }
   }
 
   /// Log AST analysis.
   static void logAstAnalysis(
     String description, {
-    bool found = false,
     required Duration duration,
+    bool found = false,
   }) {
-    _logger.debug('AST analysis: $description - ${found ? 'found' : 'not found'} '
-        '(${duration.inMilliseconds}ms)');
+    _logger.debug(
+      'AST analysis: $description - ${found ? 'found' : 'not found'} '
+      '(${duration.inMilliseconds}ms)',
+    );
   }
 
   /// Log type checking.
@@ -65,8 +74,10 @@ class AnalysisMetrics {
     required bool matched,
     required Duration duration,
   }) {
-    _logger.debug('Type check: $typeName - ${matched ? 'matched' : 'not matched'} '
-        '(${duration.inMilliseconds}ms)');
+    _logger.debug(
+      'Type check: $typeName - ${matched ? 'matched' : 'not matched'} '
+      '(${duration.inMilliseconds}ms)',
+    );
   }
 
   /// Flush all pending logs.

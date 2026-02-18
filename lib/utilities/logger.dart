@@ -4,6 +4,7 @@
 
 // Logger utility for nocterm_lints plugin.
 // ignore_for_file: use_setters_to_change_properties
+// ignore_for_file: prefer_constructors_over_static_methods
 
 import 'dart:io';
 
@@ -57,14 +58,13 @@ class NoctermLogger {
   /// Global shared logger instance.
   static NoctermLogger get instance => _instance ??= _createInstance();
 
-  late File _logFile;
+  late final File _logFile;
   late LogLevel _logLevel;
   late bool _enabled;
   final List<String> _buffer = [];
   static const int _bufferSize = 1;
 
   /// Create logger for testing (internal use only).
-  // ignore: prefer_constructors_over_static_methods
   static NoctermLogger createForTesting(File logFile) {
     _instance = NoctermLogger._(
       logFile,
@@ -171,18 +171,8 @@ class NoctermLogger {
     if (_buffer.length >= _bufferSize) {
       flush();
     }
-    flush();
   }
-
-  /// Get environment variable safely.
-  static String? _getEnv(String name) {
-    try {
-      return Platform.environment[name];
-    } catch (e) {
-      return null;
-    }
-  }
-
+  /// Create logger instance with file in app directory.
   static NoctermLogger _createInstance() {
     final logFile = File(path.join(appDir.path, 'nocterm_lints.log'));
     return NoctermLogger._(logFile);

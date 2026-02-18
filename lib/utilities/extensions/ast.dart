@@ -3,6 +3,9 @@
 // Use of this source code is governed by a BSD-3-Clause license.
 // See LICENSE file for details.
 
+// Extension methods for working with the Dart AST.
+// ignore_for_file: avoid_catching_errors
+
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';

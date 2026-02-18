@@ -28,7 +28,9 @@ class MoveDown extends ResolvedCorrectionProducer {
   Future<void> compute(ChangeBuilder builder) async {
     final widget = node.findComponentExpression;
     if (widget == null) {
-      logError('MoveDown: No component expression found at offset $selectionOffset');
+      logError(
+        'MoveDown: No component expression found at offset $selectionOffset',
+      );
       return;
     }
 

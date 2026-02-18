@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:analysis_server_plugin/plugin.dart';
 import 'package:analysis_server_plugin/registry.dart';
 
-import 'assistants/convert_to_stateful_component.dart';
-import 'assistants/convert_to_stateless_component.dart';
 import 'assistants/move_down.dart';
 import 'assistants/move_up.dart';
 import 'assistants/remove_widget.dart';
@@ -78,7 +76,6 @@ class NoctermLintsPlugin extends Plugin {
       /// Widget conversion assists
       // registry.registerAssist(ConvertToStatefulComponent.new);
       // registry.registerAssist(ConvertToStatelessComponent.new);
-      
     } catch (e, stackTrace) {
       logger.error('[nocterm_lints] registering assists: $e', e, stackTrace);
       logger.flush();
