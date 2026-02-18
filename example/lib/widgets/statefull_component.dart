@@ -24,7 +24,9 @@ class _StatefulComponentXState extends State<StatefulComponentX>
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
-        return Container(child: Text('This is a stateful component.'));
+        return Center(
+          child: Container(child: Text('This is a stateful component.')),
+        );
       },
     );
   }

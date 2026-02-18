@@ -32,7 +32,7 @@ class NoctermLintsPlugin extends Plugin {
   @override
   FutureOr<void> start() {
     final logger = NoctermLogger.instance;
-    logger.setEnabled(true);
+    logger.setEnabled(false);
     logger.setLogLevel(LogLevel.info);
     logger.clear();
     logger.info('NoctermLintsPlugin starting');
@@ -76,9 +76,9 @@ class NoctermLintsPlugin extends Plugin {
       registry.registerAssist(WrapValueListenableBuilder.new);
 
       /// Widget conversion assists
-      registry.registerAssist(ConvertToStatefulComponent.new);
-      registry.registerAssist(ConvertToStatelessComponent.new);
-      logger.flush();
+      // registry.registerAssist(ConvertToStatefulComponent.new);
+      // registry.registerAssist(ConvertToStatelessComponent.new);
+      
     } catch (e, stackTrace) {
       logger.error('[nocterm_lints] registering assists: $e', e, stackTrace);
       logger.flush();

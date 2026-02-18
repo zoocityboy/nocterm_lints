@@ -7,7 +7,6 @@
 
 import 'dart:io';
 
-import 'package:analyzer/workspace/workspace.dart';
 import 'package:path/path.dart' as path;
 
 /// Log level severity.
