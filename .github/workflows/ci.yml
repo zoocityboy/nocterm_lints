@@ -1,33 +1,42 @@
 name: CI
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
 
   workflow_dispatch:
-
 jobs:
-  lint:
-    name: Lint & Format
+  analyze:
+    name: Analyze
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: stable
+
       - name: Install dependencies
         run: dart pub get
+
       - name: Check formatting
-        run: dart format --set-exit-if-changed .
-      - name: Static analysis
-        run: dart analyze
+        run: dart format --output=none --set-exit-if-changed lib/ test/ bin/ example/
+
+      - name: Analyze project source
+        run: dart analyze --fatal-infos
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install dependencies
+        run: dart pub get
+
       - name: Run tests
         run: dart test --reporter expanded
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: test/**/results* || .

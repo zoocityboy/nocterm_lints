@@ -9,5 +9,33 @@
 			"path": "example"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"dart.analyzerInstrumentationLogFile": "logs/instrumental.log",
+		"dart.analyzerLogFile": "logs/analyzer.log",
+		"dart.lineLength": 80,
+		"editor.formatOnSave": true,
+		"editor.codeActionsOnSave": {
+			"source.fixAll": "always",
+			"source.organizeImports": "always"
+		},
+		"[dart]": {
+			"editor.formatOnSave": true,
+			"editor.formatOnType": true,
+			"editor.rulers": [
+				80,
+				100,
+			],
+		},
+		"github.copilot.chat.agent.autoFix": true,
+		"github.copilot.chat.agentCustomizationSkill.enabled": true,
+		"chat.agentSkillsLocations": {
+			".github/skills": true,
+			".agents/skills": true,
+			".claude/skills": true,
+			"~/.copilot/skills": true,
+			"~/.agents/skills": true,
+			"~/.claude/skills": true
+		},
+		"postman.settings.dotenv-detection-notification-visibility": false
+	}
 }

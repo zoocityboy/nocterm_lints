@@ -1,11 +1,11 @@
-// Copyright (c) 2022, the Dart project authors.
-// Copyright (c) 2026, zoocityboy.
-// Use of this source code is governed by a BSD-3-Clause license.
-// See LICENSE file for details.
+// Copyright (c) 2022, the Dart project authors. Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
 
+import 'package:_fe_analyzer_shared/src/scanner/token.dart';
+// import 'package:analysis_server/src/services/correction/assist.dart';
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -16,13 +16,14 @@ import 'package:analyzer_plugin/utilities/assist/assist.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
 
+import '../../../utilities/extensions/ast.dart';
 import '../services/correction/assist.dart';
-import '../utilities/extensions/ast.dart';
+import '../utilities/extensions/logging_extensions.dart';
 import '../utilities/extensions/nocterm.dart';
 import '../utilities/extensions/session_helper.dart';
 
-class ConvertToStatelessWidget extends ResolvedCorrectionProducer {
-  ConvertToStatelessWidget({required super.context});
+class ConvertToStatelessComponent extends ResolvedCorrectionProducer {
+  ConvertToStatelessComponent({required super.context});
 
   @override
   CorrectionApplicability get applicability =>
@@ -34,38 +35,59 @@ class ConvertToStatelessWidget extends ResolvedCorrectionProducer {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
+    logInfo('Starting assist: Convert to StatelessComponent');
     final componentClass = node.thisOrAncestorOfType<ClassDeclaration>();
     final superclass = componentClass?.extendsClause?.superclass;
-    if (componentClass == null || superclass == null) return;
-
+    logInfo(
+      'Found component class: ${componentClass?.name.lexeme}, '
+      'superclass: ${superclass?.name.lexeme}',
+    );
+    if (componentClass == null || superclass == null) {
+      logError(
+        ' No class declaration or superclass found at offset $selectionOffset',
+      );
+      return;
+    }
+    // useDeclaringConstructorsAst = true;
     final componentClassBody = componentClass.body;
     if (componentClassBody is! BlockClassBody) {
+      logError(
+        ' Component class body is not a '
+        'block ${componentClassBody.runtimeType}',
+      );
       return;
     }
 
     // Don't spam, activate only from the `class` keyword to the class body.
     if (selectionOffset < componentClass.classKeyword.offset ||
         selectionOffset > componentClassBody.leftBracket.end) {
+      logError(
+        ' Selection is outside the component class body',
+      );
       return;
     }
 
-    // Must be a StatefulWidget subclass.
-    final widgetClassFragment = componentClass.declaredFragment!;
-    final widgetClassElement = widgetClassFragment.element;
-    final superType = widgetClassElement.supertype;
+    // Must be a StatefulComponent subclass.
+    final componentClassFragment = componentClass.declaredFragment!;
+    final componentClassElement = componentClassFragment.element;
+    final superType = componentClassElement.supertype;
     if (superType == null || !superType.isExactlyStatefulComponentType) {
+      logError(
+        ' Component class is not a StatefulComponent subclass',
+      );
       return;
     }
 
     final createStateMethod = _findCreateStateMethod(componentClass);
     if (createStateMethod == null) return;
 
-    final stateClass = _findStateClass(widgetClassElement);
+    final stateClass = _findStateClass(componentClassElement);
     final stateClassElement = stateClass?.declaredFragment!.element;
     if (stateClass == null ||
         stateClassElement == null ||
         !Identifier.isPrivateName(stateClass.namePart.typeName.lexeme) ||
         !_isSameTypeParameters(componentClass, stateClass)) {
+      logError(' State class is not valid');
       return;
     }
 
@@ -78,17 +100,26 @@ class ConvertToStatelessWidget extends ResolvedCorrectionProducer {
       } else if (member is MethodDeclaration) {
         member.accept(verifier);
         if (!verifier.canBeStateless) {
+          logError(
+            ' State class cannot be converted to StatelessComponent',
+          );
           return;
         }
       }
     }
 
     final usageVerifier = _StateUsageVisitor(
-      widgetClassElement,
+      componentClassElement,
       stateClassElement,
     );
     unit.visitChildren(usageVerifier);
-    if (usageVerifier.used) return;
+    if (usageVerifier.used) {
+      logError(
+        ' State class is used in a way that prevents'
+        ' conversion to StatelessComponent',
+      );
+      return;
+    }
 
     final fieldsAssignedInConstructors =
         fieldFinder.fieldsAssignedInConstructors;
@@ -99,6 +130,11 @@ class ConvertToStatelessWidget extends ResolvedCorrectionProducer {
     for (final member in stateClass.members2) {
       if (member is FieldDeclaration) {
         if (member.isStatic) {
+          logWarning(
+            ' Static members cannot be moved to StatelessComponent '
+            ' and will be skipped: '
+            '${member.fields.variables.map((v) => v.name.lexeme).join(', ')}',
+          );
           return;
         }
         for (final fieldNode in member.fields.variables) {
@@ -121,6 +157,10 @@ class ConvertToStatelessWidget extends ResolvedCorrectionProducer {
         }
       } else if (member is MethodDeclaration) {
         if (member.isStatic) {
+          logWarning(
+            ' Static members cannot be moved to StatelessComponent and will'
+            ' be skipped: ${member.name.lexeme}',
+          );
           return;
         }
         if (!_isDefaultOverride(member)) {
@@ -131,15 +171,15 @@ class ConvertToStatelessWidget extends ResolvedCorrectionProducer {
     }
 
     /// Return the code for the [movedNode], so that qualification of the
-    /// references to the widget (`widget.` or static `MyWidgetClass.`)
+    /// references to the widget (`widget.` or static `MyComponentClass.`)
     /// is removed
-    String rewriteWidgetMemberReferences(AstNode movedNode) {
+    String rewriteComponentMemberReferences(AstNode movedNode) {
       final linesRange = utils.getLinesRange(range.node(movedNode));
       final text = utils.getRangeText(linesRange);
 
       // Remove `widget.` before references to the widget instance members.
       final visitor = _ReplacementEditBuilder(
-        widgetClassElement,
+        componentClassElement,
         elementsToMove,
         linesRange,
       );
@@ -152,6 +192,7 @@ class ConvertToStatelessWidget extends ResolvedCorrectionProducer {
       'StatelessComponent',
     );
     if (statelessComponentClass == null) {
+      logError(' Could not find StatelessComponent class');
       return;
     }
 
@@ -183,7 +224,7 @@ class ConvertToStatelessWidget extends ResolvedCorrectionProducer {
             builder.writeln(utils.getText(offset, length));
           }
 
-          final text = rewriteWidgetMemberReferences(member);
+          final text = rewriteComponentMemberReferences(member);
           builder.write(text);
           if (newLine || i < nodesToMove.length - 1) {
             builder.writeln();
@@ -193,8 +234,8 @@ class ConvertToStatelessWidget extends ResolvedCorrectionProducer {
     });
   }
 
-  MethodDeclaration? _findCreateStateMethod(ClassDeclaration widgetClass) {
-    for (final member in widgetClass.members2) {
+  MethodDeclaration? _findCreateStateMethod(ClassDeclaration componentClass) {
+    for (final member in componentClass.members2) {
       if (member is MethodDeclaration && member.name.lexeme == 'createState') {
         final parameters = member.parameters;
         if (parameters?.parameters.isEmpty ?? false) {
@@ -203,39 +244,47 @@ class ConvertToStatelessWidget extends ResolvedCorrectionProducer {
         break;
       }
     }
+    logError(' Could not find createState method');
     return null;
   }
 
-  ClassDeclaration? _findStateClass(ClassElement widgetClassElement) {
+  ClassDeclaration? _findStateClass(ClassElement componentClassElement) {
     for (final declaration in unit.declarations) {
       if (declaration is ClassDeclaration) {
         final type = declaration.extendsClause?.superclass.type;
 
-        if (_isState(widgetClassElement, type)) {
+        if (_isState(componentClassElement, type)) {
           return declaration;
         }
       }
     }
+    logError(' Could not find State class');
     return null;
   }
 
   bool _isSameTypeParameters(
-    ClassDeclaration widgetClass,
+    ClassDeclaration componentClass,
     ClassDeclaration stateClass,
   ) {
     List<TypeParameter>? parameters(ClassDeclaration declaration) =>
         declaration.namePart.typeParameters?.typeParameters;
 
-    final widgetParams = parameters(widgetClass);
+    final widgetParams = parameters(componentClass);
     final stateParams = parameters(stateClass);
 
     if (widgetParams == null && stateParams == null) {
+      logError('Both widget and state classes have no type parameters');
       return true;
     }
     if (widgetParams == null || stateParams == null) {
+      logError('Mismatch in type parameters between widget and state classes');
       return false;
     }
     if (widgetParams.length < stateParams.length) {
+      logError(
+        'State class has more type parameters than widget class, '
+        'which is not supported',
+      );
       return false;
     }
     outer:
@@ -246,6 +295,7 @@ class ConvertToStatelessWidget extends ResolvedCorrectionProducer {
           continue outer;
         }
       }
+      logError('Type parameters do not match between widget and state classes');
       return false;
     }
     return true;
@@ -273,15 +323,16 @@ class ConvertToStatelessWidget extends ResolvedCorrectionProducer {
         return true;
       }
     }
+
     return false;
   }
 
-  static bool _isState(ClassElement widgetClassElement, DartType? type) {
+  static bool _isState(ClassElement componentClassElement, DartType? type) {
     if (type is! InterfaceType) return false;
 
     final firstArgument = type.typeArguments.singleOrNull;
     if (firstArgument is! InterfaceType ||
-        firstArgument.element != widgetClassElement) {
+        firstArgument.element != componentClassElement) {
       return false;
     }
 
@@ -325,11 +376,11 @@ class _FieldFinder extends RecursiveAstVisitor<void> {
 
 class _ReplacementEditBuilder extends RecursiveAstVisitor<void> {
   _ReplacementEditBuilder(
-    this.widgetClassElement,
+    this.componentClassElement,
     this.elementsToMove,
     this.linesRange,
   );
-  final ClassElement widgetClassElement;
+  final ClassElement componentClassElement;
 
   final Set<Element> elementsToMove;
 
@@ -344,7 +395,7 @@ class _ReplacementEditBuilder extends RecursiveAstVisitor<void> {
     }
     final element = node.element;
     if (element is ExecutableElement &&
-        element.enclosingElement == widgetClassElement &&
+        element.enclosingElement == componentClassElement &&
         !elementsToMove.contains(element)) {
       final parent = node.parent;
       if (parent is PrefixedIdentifier) {
@@ -402,7 +453,7 @@ class _StatelessVerifier extends RecursiveAstVisitor<void> {
     final classElement = methodElement?.enclosingElement;
     if (classElement is ClassElement &&
         classElement.isExactState &&
-        !ConvertToStatelessWidget._isDefaultOverride(
+        !ConvertToStatelessComponent._isDefaultOverride(
           node.thisOrAncestorOfType<MethodDeclaration>(),
         )) {
       canBeStateless = false;
@@ -413,9 +464,9 @@ class _StatelessVerifier extends RecursiveAstVisitor<void> {
 }
 
 class _StateUsageVisitor extends RecursiveAstVisitor<void> {
-  _StateUsageVisitor(this.widgetClassElement, this.stateClassElement);
+  _StateUsageVisitor(this.componentClassElement, this.stateClassElement);
   bool used = false;
-  ClassElement widgetClassElement;
+  ClassElement componentClassElement;
   ClassElement stateClassElement;
 
   @override
@@ -430,7 +481,7 @@ class _StateUsageVisitor extends RecursiveAstVisitor<void> {
         ?.thisOrAncestorOfType<ClassDeclaration>();
 
     if (methodDeclaration?.name.lexeme != 'createState' ||
-        classDeclaration?.declaredFragment!.element != widgetClassElement) {
+        classDeclaration?.declaredFragment!.element != componentClassElement) {
       used = true;
     }
   }
@@ -440,7 +491,7 @@ class _StateUsageVisitor extends RecursiveAstVisitor<void> {
     final type = node.staticType;
     if (type is InterfaceType &&
         node.methodName.name == 'createState' &&
-        (ConvertToStatelessWidget._isState(widgetClassElement, type) ||
+        (ConvertToStatelessComponent._isState(componentClassElement, type) ||
             type.element == stateClassElement)) {
       used = true;
     }

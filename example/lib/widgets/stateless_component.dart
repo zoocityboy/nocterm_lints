@@ -3,6 +3,6 @@ import 'package:nocterm/nocterm.dart';
 class StatelessComponentX extends StatelessComponent {
   @override
   Component build(BuildContext context) {
-    throw UnimplementedError();
+    return Container(child: Text('This is a stateless component.'));
   }
 }

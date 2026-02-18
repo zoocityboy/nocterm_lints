@@ -18,6 +18,7 @@ analyzer:
     avoid_positional_boolean_parameters: ignore
     avoid_catches_without_on_clauses: ignore
     dangling_library_doc_comments: ignore
+    no_runtimetype_tostring: ignore
 
   exclude:
     - test/.test_coverage.dart
@@ -167,7 +168,6 @@ linter:
     - remove_deprecations_in_breaking_versions
     - require_trailing_commas
     - secure_pubspec_urls
-    - simplify_variable_pattern
     - sized_box_for_whitespace
     - sized_box_shrink_expand
     - slash_for_doc_comments

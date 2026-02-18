@@ -17,29 +17,47 @@ import 'package:analyzer_plugin/utilities/range_factory.dart';
 
 import '../services/correction/assist.dart';
 import '../utilities/extensions/ast.dart';
+import '../utilities/extensions/logging_extensions.dart';
 import '../utilities/extensions/nocterm.dart';
 import '../utilities/extensions/session_helper.dart';
 
-class ConvertToStatefulWidget extends ResolvedCorrectionProducer {
-  ConvertToStatefulWidget({required super.context});
+class ConvertToStatefulComponent extends ResolvedCorrectionProducer {
+  ConvertToStatefulComponent({required super.context});
 
   @override
   CorrectionApplicability get applicability =>
       CorrectionApplicability.singleLocation;
 
   @override
-  AssistKind get assistKind => DartAssistKind.noctermConvertToStatefulWidget;
+  AssistKind get assistKind => DartAssistKind.noctermConvertToStatefulComponent;
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
+    useDeclaringConstructorsAst = true;
+    logInfo(
+      'Computing assist at offset $selectionOffset',
+    );
+
     final componentClass = node.thisOrAncestorOfType<ClassDeclaration>();
     final superclass = componentClass?.extendsClause?.superclass;
     if (componentClass == null || superclass == null) {
+      logError(
+        'No class declaration or superclass found at offset $selectionOffset',
+      );
       return;
     }
 
-    final body = componentClass.body;
-    if (body is! BlockClassBody) {
+    late final body = componentClass.body;
+    try {
+      if (body is! BlockClassBody) {
+        return;
+      }
+    } catch (e, s) {
+      logError(
+        'Failed to analyze class body at offset $selectionOffset',
+        e,
+        s,
+      );
       return;
     }
 
@@ -126,7 +144,13 @@ class ConvertToStatefulWidget extends ResolvedCorrectionProducer {
       sessionHelper,
       'StatefulComponent',
     );
+    logInfo(
+      'Found StatefulComponent class: ${statefulComponentClass != null}',
+    );
     final stateClass = await getNoctermClass(sessionHelper, 'State');
+    logInfo(
+      'Found State class: ${stateClass != null}',
+    );
     if (statefulComponentClass == null || stateClass == null) {
       return;
     }

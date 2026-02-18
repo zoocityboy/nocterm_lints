@@ -46,7 +46,10 @@ abstract class _BaseWrapBuilder extends ResolvedCorrectionProducer {
     }
     var widgetSrc = utils.getNodeText(widgetExpr);
 
-    final builderElement = await sessionHelper.getFlutterClass(builderName);
+    final builderElement = await sessionHelper.getClass(
+      noctermUri,
+      builderName,
+    );
     if (builderElement == null) {
       return;
     }
