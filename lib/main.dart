@@ -56,8 +56,8 @@ class NoctermLintsPlugin extends Plugin {
       registry.registerAssist(WrapValueListenableBuilder.new);
 
       /// Widget conversion assists
-      registry.registerAssist(ConvertToStatefulWidget.new);
-      registry.registerAssist(ConvertToStatelessWidget.new);
+      // registry.registerAssist(ConvertToStatefulWidget.new);
+      // registry.registerAssist(ConvertToStatelessWidget.new);
     } catch (e, stackTrace) {
       log(
         '[nocterm_lints] registering assists: $e',
