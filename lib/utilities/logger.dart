@@ -172,6 +172,7 @@ class NoctermLogger {
       flush();
     }
   }
+
   /// Create logger instance with file in app directory.
   static NoctermLogger _createInstance() {
     final logFile = File(path.join(appDir.path, 'nocterm_lints.log'));
