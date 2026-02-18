@@ -214,11 +214,18 @@ extension BinaryExpressionExtension on BinaryExpression {
 
 extension ClassDeclarationExtension on ClassDeclaration {
   List<ClassMember> get members2 {
-    switch (body) {
-      case final BlockClassBody body:
-        return body.members;
-      default:
-        return [];
+    // Accessing `body` may throw UnsupportedError when the analyzer is
+    // configured without optional AST features (e.g. declaring constructors).
+    // Guard here so callers don't need to handle the exception.
+    try {
+      switch (body) {
+        case final BlockClassBody body:
+          return body.members;
+        default:
+          return [];
+      }
+    } on UnsupportedError {
+      return [];
     }
   }
 }
@@ -347,11 +354,18 @@ extension ExpressionExtension on Expression {
 
 extension ExtensionTypeDeclarationExtension on ExtensionTypeDeclaration {
   List<ClassMember> get members2 {
-    switch (body) {
-      case final BlockClassBody body:
-        return body.members;
-      default:
-        return [];
+    // Guard access to `body` for analyzer contexts that don't expose
+    // optional AST features. Return an empty list instead of letting an
+    // UnsupportedError bubble up to plugin code.
+    try {
+      switch (body) {
+        case final BlockClassBody body:
+          return body.members;
+        default:
+          return [];
+      }
+    } on UnsupportedError {
+      return [];
     }
   }
 }

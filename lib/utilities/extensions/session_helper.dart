@@ -5,6 +5,8 @@ import 'package:analyzer/dart/element/element.dart';
 // ignore: implementation_imports
 import 'package:analyzer/src/dart/analysis/session_helper.dart';
 
+import '../logger.dart';
+
 /// Returns the class element for the given [className] from the Nocterm
 /// package, or `null` if it can't be found.
 ///
@@ -15,8 +17,13 @@ Future<ClassElement?> getNoctermClass(
   AnalysisSessionHelper sessionHelper,
   String className,
 ) {
-  return sessionHelper.getClass(
+  NoctermLogger.instance.debug('Looking up Nocterm class: $className');
+  final result = sessionHelper.getClass(
     'package:nocterm/src/framework/framework.dart',
     className,
   );
+
+  NoctermLogger.instance.debug('Found Nocterm class: $className');
+
+  return result;
 }

@@ -5,23 +5,27 @@ class StatefulComponentX extends StatefulComponent {
   State<StatefulComponentX> createState() => _StatefulComponentXState();
 }
 
-class _StatefulComponentXState extends State<StatefulComponentX> {
+class _StatefulComponentXState extends State<StatefulComponentX>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
   @override
-  Component build(BuildContext context) {
-    return Container(child: Text('This is a stateful component.'));
+  void initState() {
+    // TODO: implement initState
+
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 1),
+    );
   }
-}
 
-class Nocterm extends StatefulComponent {
-  const Nocterm({Key? key}) : super(key: key);
-
-  @override
-  State<Nocterm> createState() => _NoctermState();
-}
-
-class _NoctermState extends State<Nocterm> {
   @override
   Component build(BuildContext context) {
-    return const SizedBox.shrink();
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Container(child: Text('This is a stateful component.'));
+      },
+    );
   }
 }

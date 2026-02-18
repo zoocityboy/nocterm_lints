@@ -11,6 +11,7 @@ import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dar
 import 'package:analyzer_plugin/utilities/range_factory.dart';
 
 import '../services/correction/assist.dart';
+import '../utilities/extensions/logging_extensions.dart';
 import '../utilities/extensions/nocterm.dart';
 
 class MoveDown extends ResolvedCorrectionProducer {
@@ -27,6 +28,7 @@ class MoveDown extends ResolvedCorrectionProducer {
   Future<void> compute(ChangeBuilder builder) async {
     final widget = node.findComponentExpression;
     if (widget == null) {
+      logError('MoveDown: No component expression found at offset $selectionOffset');
       return;
     }
 
