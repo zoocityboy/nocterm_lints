@@ -1,3 +1,19 @@
+# 0.3.0+beta.3
+- **refactor**: simplified assist registration and structure
+  - Consolidated producer implementations for improved maintainability
+  - Updated registration pattern in `lib/main.dart`
+
+- **feat**: enhanced analyzer plugin compatibility
+  - Verified compatibility with latest `analysis_server_plugin` versions
+  - Improved error handling in assist producers
+
+- **docs**: updated documentation
+  - Refreshed CHANGELOG formatting
+  - Updated README examples for clarity
+
+- **chore**: code cleanup
+  - Removed obsolete files and imports
+
 # 0.3.0+beta.2
 
 - **refactor**: removed `Nocterm` prefix from assistant filenames and exported class names

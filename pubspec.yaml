@@ -1,6 +1,6 @@
 name: nocterm_lints
 description: Nocterm lints add Assistants to the editor.
-version: 0.3.0+beta.2
+version: 0.3.0+beta.3
 repository: https://github.com/zoocityboy/nocterm_lints
 homepage: https://zoocityboy.github.io/nocterm_lints
 issue_tracker: https://github.com/zoocityboy/nocterm_lints/issues
@@ -14,9 +14,9 @@ environment:
 
 dependencies:
   _fe_analyzer_shared: ^92.0.0
-  analysis_server_plugin: ">=0.3.4 <0.4.0"
+  analysis_server_plugin: '>=0.3.4 <0.4.0'
   analyzer: '>=9.0.0 <10.0.0'
-  analyzer_plugin: ">=0.13.8 <0.14.0"
+  analyzer_plugin: '>=0.13.8 <0.14.0'
   collection: ^1.19.0
   nocterm: ^0.5.0
   path: ^1.9.1
