@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:analysis_server_plugin/plugin.dart';
 import 'package:analysis_server_plugin/registry.dart';
 
+import 'assistants/convert_to_stateful_component.dart';
+import 'assistants/convert_to_stateless_component.dart';
 import 'assistants/move_down.dart';
 import 'assistants/move_up.dart';
 import 'assistants/remove_widget.dart';
@@ -30,7 +32,7 @@ class NoctermLintsPlugin extends Plugin {
   @override
   FutureOr<void> start() {
     final logger = NoctermLogger.instance;
-    logger.setEnabled(false);
+    logger.setEnabled(true);
     logger.setLogLevel(LogLevel.info);
     logger.clear();
     logger.info('NoctermLintsPlugin starting');
@@ -50,12 +52,14 @@ class NoctermLintsPlugin extends Plugin {
     final logger = NoctermLogger.instance;
     try {
       /// Widget manipulation assists
+      logger.info('Registering assists...');
 
       registry.registerAssist(MoveDown.new);
       registry.registerAssist(MoveUp.new);
       registry.registerAssist(RemoveWidget.new);
       registry.registerAssist(SwapWithChild.new);
       registry.registerAssist(SwapWithParent.new);
+      logger.info('Registered widget manipulation assists');
 
       /// Component wrapping assists
       registry.registerAssist(WrapComponent.new);
@@ -68,14 +72,17 @@ class NoctermLintsPlugin extends Plugin {
       registry.registerAssist(WrapSizedBox.new);
       registry.registerAssist(WrapRow.new);
       registry.registerAssist(WrapColumn.new);
+      logger.info('Registered widget manipulation and wrapping assists');
 
       /// Builder wrap assists
       registry.registerAssist(WrapBuilder.new);
       registry.registerAssist(WrapValueListenableBuilder.new);
+      logger.info('Registered builder wrap assists');
 
       /// Widget conversion assists
-      // registry.registerAssist(ConvertToStatefulComponent.new);
-      // registry.registerAssist(ConvertToStatelessComponent.new);
+      registry.registerAssist(ConvertToStatefulComponent.new);
+      registry.registerAssist(ConvertToStatelessComponent.new);
+      logger.info('Registered widget conversion assists');
     } catch (e, stackTrace) {
       logger.error('[nocterm_lints] registering assists: $e', e, stackTrace);
       logger.flush();

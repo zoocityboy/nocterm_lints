@@ -5,6 +5,6 @@ class Counter extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return const SizedBox.shrink();
+    return Center(child: const SizedBox.shrink());
   }
 }

@@ -1,11 +1,12 @@
 // Copyright (c) 2022, the Dart project authors. Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
+// Copyright (c) 2026, zoocityboy.
+// Use of this source code is governed by a BSD-3-Clause license.
 
-import 'package:_fe_analyzer_shared/src/scanner/token.dart';
-// import 'package:analysis_server/src/services/correction/assist.dart';
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -16,8 +17,8 @@ import 'package:analyzer_plugin/utilities/assist/assist.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/range_factory.dart';
 
-import '../../../utilities/extensions/ast.dart';
 import '../services/correction/assist.dart';
+import '../utilities/extensions/ast.dart';
 import '../utilities/extensions/logging_extensions.dart';
 import '../utilities/extensions/nocterm.dart';
 import '../utilities/extensions/session_helper.dart';
@@ -35,203 +36,212 @@ class ConvertToStatelessComponent extends ResolvedCorrectionProducer {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
-    logInfo('Starting assist: Convert to StatelessComponent');
-    final componentClass = node.thisOrAncestorOfType<ClassDeclaration>();
-    final superclass = componentClass?.extendsClause?.superclass;
-    logInfo(
-      'Found component class: ${componentClass?.name.lexeme}, '
-      'superclass: ${superclass?.name.lexeme}',
-    );
-    if (componentClass == null || superclass == null) {
-      logError(
-        ' No class declaration or superclass found at offset $selectionOffset',
+    try {
+      logInfo('Starting assist: Convert to StatelessComponent');
+      final componentClass = node.thisOrAncestorOfType<ClassDeclaration>();
+      final superclass = componentClass?.extendsClause?.superclass;
+      logInfo(
+        'Found component class: ${componentClass?.namePart.typeName.lexeme}, '
+        'superclass: ${superclass?.name.lexeme}',
       );
-      return;
-    }
-    // useDeclaringConstructorsAst = true;
-    final componentClassBody = componentClass.body;
-    if (componentClassBody is! BlockClassBody) {
-      logError(
-        ' Component class body is not a '
-        'block ${componentClassBody.runtimeType}',
-      );
-      return;
-    }
-
-    // Don't spam, activate only from the `class` keyword to the class body.
-    if (selectionOffset < componentClass.classKeyword.offset ||
-        selectionOffset > componentClassBody.leftBracket.end) {
-      logError(
-        ' Selection is outside the component class body',
-      );
-      return;
-    }
-
-    // Must be a StatefulComponent subclass.
-    final componentClassFragment = componentClass.declaredFragment!;
-    final componentClassElement = componentClassFragment.element;
-    final superType = componentClassElement.supertype;
-    if (superType == null || !superType.isExactlyStatefulComponentType) {
-      logError(
-        ' Component class is not a StatefulComponent subclass',
-      );
-      return;
-    }
-
-    final createStateMethod = _findCreateStateMethod(componentClass);
-    if (createStateMethod == null) return;
-
-    final stateClass = _findStateClass(componentClassElement);
-    final stateClassElement = stateClass?.declaredFragment!.element;
-    if (stateClass == null ||
-        stateClassElement == null ||
-        !Identifier.isPrivateName(stateClass.namePart.typeName.lexeme) ||
-        !_isSameTypeParameters(componentClass, stateClass)) {
-      logError(' State class is not valid');
-      return;
-    }
-
-    final verifier = _StatelessVerifier();
-    final fieldFinder = _FieldFinder();
-
-    for (final member in stateClass.members2) {
-      if (member is ConstructorDeclaration) {
-        member.accept(fieldFinder);
-      } else if (member is MethodDeclaration) {
-        member.accept(verifier);
-        if (!verifier.canBeStateless) {
-          logError(
-            ' State class cannot be converted to StatelessComponent',
-          );
-          return;
-        }
+      if (componentClass == null || superclass == null) {
+        logError(
+          ' No class declaration or superclass found at offset $selectionOffset',
+        );
+        return;
       }
-    }
-
-    final usageVerifier = _StateUsageVisitor(
-      componentClassElement,
-      stateClassElement,
-    );
-    unit.visitChildren(usageVerifier);
-    if (usageVerifier.used) {
-      logError(
-        ' State class is used in a way that prevents'
-        ' conversion to StatelessComponent',
-      );
-      return;
-    }
-
-    final fieldsAssignedInConstructors =
-        fieldFinder.fieldsAssignedInConstructors;
-
-    // Prepare nodes to move.
-    final nodesToMove = <ClassMember>[];
-    final elementsToMove = <Element>{};
-    for (final member in stateClass.members2) {
-      if (member is FieldDeclaration) {
-        if (member.isStatic) {
-          logWarning(
-            ' Static members cannot be moved to StatelessComponent '
-            ' and will be skipped: '
-            '${member.fields.variables.map((v) => v.name.lexeme).join(', ')}',
-          );
+      late final componentClassBody = componentClass.body;
+      try {
+        if (componentClassBody is! BlockClassBody) {
+          logError(' Component class body is not a block');
           return;
         }
-        for (final fieldNode in member.fields.variables) {
-          final fieldElement =
-              fieldNode.declaredFragment!.element as FieldElement;
-          if (!fieldsAssignedInConstructors.contains(fieldElement)) {
-            nodesToMove.add(member);
-            elementsToMove.add(fieldElement);
+      } catch (e, s) {
+        logError(
+          'Failed to analyze class body at offset $selectionOffset',
+          e,
+          s,
+        );
+        return;
+      }
 
-            final getter = fieldElement.getter;
-            if (getter != null) {
-              elementsToMove.add(getter);
-            }
+      // Don't spam, activate only from the `class` keyword to the class body.
+      if (selectionOffset < componentClass.classKeyword.offset ||
+          selectionOffset > componentClassBody.rightBracket.end) {
+        logError(
+          ' Selection is outside the component class body',
+        );
+        return;
+      }
 
-            final setter = fieldElement.setter;
-            if (setter != null) {
-              elementsToMove.add(setter);
-            }
+      // Must be a StatefulComponent subclass.
+      final componentClassFragment = componentClass.declaredFragment!;
+      final componentClassElement = componentClassFragment.element;
+      final superType = componentClassElement.supertype;
+      if (superType == null || !superType.isExactlyStatefulComponentType) {
+        logError(
+          ' Component class is not a StatefulComponent subclass',
+        );
+        return;
+      }
+
+      final createStateMethod = _findCreateStateMethod(componentClass);
+      if (createStateMethod == null) return;
+
+      final stateClass = _findStateClass(componentClassElement);
+      final stateClassElement = stateClass?.declaredFragment!.element;
+      if (stateClass == null ||
+          stateClassElement == null ||
+          !Identifier.isPrivateName(stateClass.namePart.typeName.lexeme) ||
+          !_isSameTypeParameters(componentClass, stateClass)) {
+        logError(' State class is not valid');
+        return;
+      }
+
+      final verifier = _StatelessVerifier();
+      final fieldFinder = _FieldFinder();
+
+      for (final member in stateClass.members2) {
+        if (member is ConstructorDeclaration) {
+          member.accept(fieldFinder);
+        } else if (member is MethodDeclaration) {
+          member.accept(verifier);
+          if (!verifier.canBeStateless) {
+            logError(
+              ' State class cannot be converted to StatelessComponent',
+            );
+            return;
           }
         }
-      } else if (member is MethodDeclaration) {
-        if (member.isStatic) {
-          logWarning(
-            ' Static members cannot be moved to StatelessComponent and will'
-            ' be skipped: ${member.name.lexeme}',
-          );
-          return;
-        }
-        if (!_isDefaultOverride(member)) {
-          nodesToMove.add(member);
-          elementsToMove.add(member.declaredFragment!.element);
-        }
       }
-    }
 
-    /// Return the code for the [movedNode], so that qualification of the
-    /// references to the widget (`widget.` or static `MyComponentClass.`)
-    /// is removed
-    String rewriteComponentMemberReferences(AstNode movedNode) {
-      final linesRange = utils.getLinesRange(range.node(movedNode));
-      final text = utils.getRangeText(linesRange);
-
-      // Remove `widget.` before references to the widget instance members.
-      final visitor = _ReplacementEditBuilder(
+      final usageVerifier = _StateUsageVisitor(
         componentClassElement,
-        elementsToMove,
-        linesRange,
+        stateClassElement,
       );
-      movedNode.accept(visitor);
-      return SourceEdit.applySequence(text, visitor.edits.reversed.toList());
-    }
+      unit.visitChildren(usageVerifier);
+      if (usageVerifier.used) {
+        logError(
+          ' State class is used in a way that prevents'
+          ' conversion to StatelessComponent',
+        );
+        return;
+      }
 
-    final statelessComponentClass = await getNoctermClass(
-      sessionHelper,
-      'StatelessComponent',
-    );
-    if (statelessComponentClass == null) {
-      logError(' Could not find StatelessComponent class');
-      return;
-    }
+      final fieldsAssignedInConstructors =
+          fieldFinder.fieldsAssignedInConstructors;
 
-    await builder.addDartFileEdit(file, (builder) {
-      builder.addReplacement(range.node(superclass), (builder) {
-        builder.writeReference(statelessComponentClass);
-      });
-
-      builder.addDeletion(range.deletionRange(stateClass));
-
-      var createStateNextToEnd = createStateMethod.endToken.next!;
-      createStateNextToEnd =
-          createStateNextToEnd.precedingComments ?? createStateNextToEnd;
-      final createStateRange = range.startOffsetEndOffset(
-        utils.getLineContentStart(createStateMethod.offset),
-        utils.getLineContentStart(createStateNextToEnd.offset),
-      );
-
-      final newLine =
-          createStateNextToEnd.type != TokenType.CLOSE_CURLY_BRACKET;
-
-      builder.addReplacement(createStateRange, (builder) {
-        for (var i = 0; i < nodesToMove.length; i++) {
-          final member = nodesToMove[i];
-          final comments = member.beginToken.precedingComments;
-          if (comments != null) {
-            final offset = utils.getLineContentStart(comments.offset);
-            final length = comments.end - offset;
-            builder.writeln(utils.getText(offset, length));
+      // Prepare nodes to move.
+      final nodesToMove = <ClassMember>[];
+      final elementsToMove = <Element>{};
+      for (final member in stateClass.members2) {
+        if (member is FieldDeclaration) {
+          if (member.isStatic) {
+            logWarning(
+              ' Static members cannot be moved to StatelessComponent '
+              ' and will be skipped: '
+              '${member.fields.variables.map((v) => v.name.lexeme).join(', ')}',
+            );
+            continue;
           }
+          for (final fieldNode in member.fields.variables) {
+            final fieldElement =
+                fieldNode.declaredFragment!.element as FieldElement;
+            if (!fieldsAssignedInConstructors.contains(fieldElement)) {
+              nodesToMove.add(member);
+              elementsToMove.add(fieldElement);
 
-          final text = rewriteComponentMemberReferences(member);
-          builder.write(text);
-          if (newLine || i < nodesToMove.length - 1) {
-            builder.writeln();
+              final getter = fieldElement.getter;
+              if (getter != null) {
+                elementsToMove.add(getter);
+              }
+
+              final setter = fieldElement.setter;
+              if (setter != null) {
+                elementsToMove.add(setter);
+              }
+            }
+          }
+        } else if (member is MethodDeclaration) {
+          if (member.isStatic) {
+            logWarning(
+              ' Static members cannot be moved to StatelessComponent and will'
+              ' be skipped: ${member.name.lexeme}',
+            );
+            continue;
+          }
+          if (!_isDefaultOverride(member)) {
+            nodesToMove.add(member);
+            elementsToMove.add(member.declaredFragment!.element);
           }
         }
+      }
+
+      /// Return the code for the [movedNode], so that qualification of the
+      /// references to the component (`component.` or static `MyComponentClass.`)
+      /// is removed
+      String rewriteComponentMemberReferences(AstNode movedNode) {
+        final linesRange = utils.getLinesRange(range.node(movedNode));
+        final text = utils.getRangeText(linesRange);
+
+        // Remove `component.` before references to the component instance members.
+        final visitor = _ReplacementEditBuilder(
+          componentClassElement,
+          elementsToMove,
+          linesRange,
+        );
+        movedNode.accept(visitor);
+        return SourceEdit.applySequence(text, visitor.edits.reversed.toList());
+      }
+
+      final statelessComponentClass = await getNoctermClass(
+        sessionHelper,
+        'StatelessComponent',
+      );
+      if (statelessComponentClass == null) {
+        logError(' Could not find StatelessComponent class');
+        return;
+      }
+
+      await builder.addDartFileEdit(file, (builder) {
+        builder.addReplacement(range.node(superclass), (builder) {
+          builder.writeReference(statelessComponentClass);
+        });
+
+        builder.addDeletion(range.deletionRange(stateClass));
+
+        var createStateNextToEnd = createStateMethod.endToken.next!;
+        createStateNextToEnd =
+            createStateNextToEnd.precedingComments ?? createStateNextToEnd;
+        final createStateRange = range.startOffsetEndOffset(
+          utils.getLineContentStart(createStateMethod.offset),
+          utils.getLineContentStart(createStateNextToEnd.offset),
+        );
+
+        final newLine =
+            createStateNextToEnd.type != TokenType.CLOSE_CURLY_BRACKET;
+
+        builder.addReplacement(createStateRange, (builder) {
+          for (var i = 0; i < nodesToMove.length; i++) {
+            final member = nodesToMove[i];
+            final comments = member.beginToken.precedingComments;
+            if (comments != null) {
+              final offset = utils.getLineContentStart(comments.offset);
+              final length = comments.end - offset;
+              builder.writeln(utils.getText(offset, length));
+            }
+
+            final text = rewriteComponentMemberReferences(member);
+            builder.write(text);
+            if (newLine || i < nodesToMove.length - 1) {
+              builder.writeln();
+            }
+          }
+        });
       });
-    });
+    } catch (e, st) {
+      logError('Exception during assist computation: $e\n$st');
+    }
   }
 
   MethodDeclaration? _findCreateStateMethod(ClassDeclaration componentClass) {
@@ -273,11 +283,13 @@ class ConvertToStatelessComponent extends ResolvedCorrectionProducer {
     final stateParams = parameters(stateClass);
 
     if (widgetParams == null && stateParams == null) {
-      logError('Both widget and state classes have no type parameters');
+      logInfo('Both component and state classes have no type parameters');
       return true;
     }
     if (widgetParams == null || stateParams == null) {
-      logError('Mismatch in type parameters between widget and state classes');
+      logError(
+        'Mismatch in type parameters between component and state classes',
+      );
       return false;
     }
     if (widgetParams.length < stateParams.length) {
@@ -345,16 +357,19 @@ class _FieldFinder extends RecursiveAstVisitor<void> {
   Set<FieldElement> fieldsAssignedInConstructors = {};
 
   @override
-  void visitSimpleIdentifier(SimpleIdentifier node) {
-    if (node.parent is FieldFormalParameter) {
-      final element = node.element;
-      if (element is FieldFormalParameterElement) {
-        final field = element.field;
-        if (field != null) {
-          fieldsAssignedInConstructors.add(field);
-        }
+  void visitFieldFormalParameter(FieldFormalParameter node) {
+    final element = node.declaredFragment?.element;
+    if (element is FieldFormalParameterElement) {
+      final field = element.field;
+      if (field != null) {
+        fieldsAssignedInConstructors.add(field);
       }
     }
+    super.visitFieldFormalParameter(node);
+  }
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
     if (node.parent is ConstructorFieldInitializer) {
       final element = node.element;
       if (element is FieldElement) {
@@ -363,12 +378,11 @@ class _FieldFinder extends RecursiveAstVisitor<void> {
     }
     if (node.inSetterContext()) {
       final element = node.writeOrReadElement;
-      final field = switch (element) {
-        PropertyAccessorElement(:final variable) => variable,
-        _ => null,
-      };
-      if (field is FieldElement) {
-        fieldsAssignedInConstructors.add(field);
+      if (element is SetterElement) {
+        final field = element.variable;
+        if (field is FieldElement) {
+          fieldsAssignedInConstructors.add(field);
+        }
       }
     }
   }
@@ -481,7 +495,7 @@ class _StateUsageVisitor extends RecursiveAstVisitor<void> {
         ?.thisOrAncestorOfType<ClassDeclaration>();
 
     if (methodDeclaration?.name.lexeme != 'createState' ||
-        classDeclaration?.declaredFragment!.element != componentClassElement) {
+        classDeclaration?.declaredFragment?.element != componentClassElement) {
       used = true;
     }
   }

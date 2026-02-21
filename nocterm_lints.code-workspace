@@ -36,6 +36,9 @@
 			"~/.agents/skills": true,
 			"~/.claude/skills": true
 		},
-		"postman.settings.dotenv-detection-notification-visibility": false
+		"postman.settings.dotenv-detection-notification-visibility": false,
+		"chat.tools.terminal.autoApprove": {
+			"true": true
+		}
 	}
 }

@@ -13,16 +13,16 @@ environment:
   sdk: '>=3.10.0 <4.0.0'
 
 dependencies:
-  _fe_analyzer_shared: ^92.0.0
-  analysis_server_plugin: '>=0.3.4 <0.4.0'
-  analyzer: '>=9.0.0 <10.0.0'
-  analyzer_plugin: '>=0.13.8 <0.14.0'
+  _fe_analyzer_shared: ^94.0.0
+  analysis_server_plugin: '>=0.3.8 <0.4.0'
+  analyzer: '>=10.0.2 <11.0.0'
+  analyzer_plugin: '>=0.14.2 <0.15.0'
   collection: ^1.19.0
   nocterm: ^0.5.0
   path: ^1.9.1
 
 dev_dependencies:
-  analyzer_testing: ^0.1.7
+  analyzer_testing: ^0.1.10
   lints: ^6.1.0
   test: ^1.28.0
   test_reflective_loader: ^0.4.0
