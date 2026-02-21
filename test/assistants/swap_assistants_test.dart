@@ -247,7 +247,7 @@ class A extends StatelessComponent {
 
   Future<SourceChange?> _computeSourceChange(
     String code, {
-    required _ProducerFactory producerFactory,
+    required ResolvedCorrectionProducer Function({required CorrectionProducerContext context}) producerFactory,
     required String offsetToken,
     String fileName = 'test.dart',
   }) async {
@@ -289,7 +289,3 @@ class A extends StatelessComponent {
   }
 }
 
-typedef _ProducerFactory =
-    ResolvedCorrectionProducer Function({
-      required CorrectionProducerContext context,
-    });

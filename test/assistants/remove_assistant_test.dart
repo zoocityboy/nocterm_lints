@@ -177,7 +177,7 @@ class A extends StatelessComponent {
   }
 
   Future<void> test_remove_builder_negative_contextUsed() async {
-    const code = '''
+    const code = r'''
 import 'package:nocterm/nocterm.dart';
 
 class A extends StatelessComponent {
@@ -187,7 +187,7 @@ class A extends StatelessComponent {
   Component build(BuildContext context) {
     return Builder(builder: (context) {
       final ctx = context;
-      return Text('\$ctx');
+      return Text('$ctx');
     });
   }
 }
