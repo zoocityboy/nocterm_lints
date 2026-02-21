@@ -36,6 +36,17 @@ plugins:
 
 After updating `analysis_options.yaml`, restart the Dart Analysis Server.
 
+## Compatibility Matrix
+
+| Component | Supported / Tested Range |
+| --- | --- |
+| Dart SDK | `>=3.10.0 <4.0.0` |
+| `analysis_server_plugin` | `>=0.3.8 <0.4.0` |
+| `analyzer` | `>=10.0.2 <11.0.0` |
+| `analyzer_plugin` | `>=0.14.2 <0.15.0` |
+| `nocterm` | `^0.5.0` |
+| Editors | VS Code, IntelliJ IDEA, Android Studio (via Dart Analysis Server) |
+
 ## All Assistants
 
 The table below lists every registered assistant in this project.
