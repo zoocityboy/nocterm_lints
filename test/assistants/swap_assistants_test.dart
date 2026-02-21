@@ -2,6 +2,9 @@
 // Use of this source code is governed by a BSD-3-Clause license.
 // See LICENSE file for details.
 
+/// This file is a part of nocterm_lints.
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 import 'package:analysis_server_plugin/src/correction/dart_change_workspace.dart';
 import 'package:analyzer/dart/analysis/results.dart';
@@ -66,8 +69,10 @@ class SwapAssistantsTest extends AssistTestBase {
     registerPackage('nocterm')
       ..addFile(
         'lib/nocterm.dart',
-        "export 'src/framework/framework.dart';"
-        "export 'src/components/basic.dart';",
+        """
+export 'src/framework/framework.dart';
+export 'src/components/basic.dart';
+""",
       )
       ..addFile('lib/src/framework/framework.dart', _frameworkStub)
       ..addFile('lib/src/components/basic.dart', _basicStub);
@@ -247,7 +252,10 @@ class A extends StatelessComponent {
 
   Future<SourceChange?> _computeSourceChange(
     String code, {
-    required ResolvedCorrectionProducer Function({required CorrectionProducerContext context}) producerFactory,
+    required ResolvedCorrectionProducer Function({
+      required CorrectionProducerContext context,
+    })
+    producerFactory,
     required String offsetToken,
     String fileName = 'test.dart',
   }) async {
@@ -288,4 +296,3 @@ class A extends StatelessComponent {
     return result;
   }
 }
-
