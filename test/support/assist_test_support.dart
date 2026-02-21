@@ -2,6 +2,10 @@
 // Use of this source code is governed by a BSD-3-Clause license.
 // See LICENSE file for details.
 
+// Test support utilities for assist tests. Provides a base class with common setup and utilities for testing [ResolvedCorrectionProducer] assists, as well as
+// a stub implementation of the `nocterm` framework to allow assists to resolve types without needing the full framework source.
+// ignore_for_file: lines_longer_than_80_chars, comment_references, depend_on_referenced_packages, library_private_types_in_public_api, avoid_dynamic_calls
+
 import 'dart:io' as io;
 
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart'

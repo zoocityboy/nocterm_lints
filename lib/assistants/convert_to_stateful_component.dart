@@ -123,14 +123,15 @@ class ConvertToStatefulComponent extends ResolvedCorrectionProducer {
       }
 
       /// Return the code for the [movedNode] which is suitable to be used
-      /// inside the `State` class, so that references to the component fields and
-      /// methods, that are not moved, are qualified with the corresponding
+      /// inside the `State` class, so that references to the component fields
+      /// and methods, that are not moved, are qualified with the corresponding
       /// instance `component.`, or static `MyComponentClass.` qualifier.
       String rewriteComponentMemberReferences(AstNode movedNode) {
         final linesRange = utils.getLinesRange(range.node(movedNode));
         final text = utils.getRangeText(linesRange);
 
-        // Insert `component.` before references to the component instance members.
+        // Insert `component.` before references
+        //to the component instance members.
         final visitor = _ReplacementEditBuilder(
           componentClassElement,
           elementsToMove,

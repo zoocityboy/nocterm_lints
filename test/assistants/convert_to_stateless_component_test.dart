@@ -2,15 +2,18 @@
 // Use of this source code is governed by a BSD-3-Clause license.
 // See LICENSE file for details.
 
+//
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 import 'package:analysis_server_plugin/src/correction/dart_change_workspace.dart';
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer_plugin/protocol/protocol_common.dart' hide Element;
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
+import 'package:nocterm_lints/assistants/convert_to_stateless_component.dart';
 import 'package:test/test.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
-import 'package:nocterm_lints/assistants/convert_to_stateless_component.dart';
 import '../support/assist_test_support.dart';
 
 void main() {

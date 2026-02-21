@@ -1,54 +1,21 @@
-<!-- <p align="center">
-<img src="https://raw.githubusercontent.com/zoocityboy/nocterm_lints/refs/heads/main/assets/nocterm_lints.png" height="100" alt="Bloc">
-</p> -->
-
 # nocterm_lints
 
+[![ZOOCITYBOY][logo_white]][zoocityboy_link_dark]
+[![ZOOCITYBOY][logo_black]][zoocityboy_link_light]
 
 [![Pub](https://img.shields.io/pub/v/nocterm_lints.svg)](https://pub.dev/packages/nocterm_lints)
 [![Dart](https://img.shields.io/badge/Dart-0175C2?logo=dart)](https://dart.dev)
-[![Nocterm](https://img.shields.io/badge/NOCTERM-f2f2f2?logo=nocterm&logoColor=000000)](https://nocterm.dev)
+[![Nocterm](https://img.shields.io/badge/Nocterm-terminal%20UI-black)](https://pub.dev/packages/nocterm)
 
-**Productivity assists for Nocterm terminal UI development**
+`nocterm_lints` is a Dart analysis server plugin focused on Nocterm UI productivity.
+It provides code actions for wrapping, moving, swapping, removing, and converting Nocterm components directly in your editor.
 
-An analysis server plugin providing intelligent IDE assists and refactoring tools for building Nocterm terminal UI components. Works seamlessly in VS Code, IntelliJ IDEA, Android Studio, and other Dart-enabled editors.
+> [!NOTE]
+> The plugin targets Dart SDK `>=3.10.0 <4.0.0` and uses the modern `analysis_server_plugin` stack.
 
-> [!info]
-> Built on the modern `analysis_server_plugin` framework (Dart 3.10+). Originally derived from Dart project foundations and enhanced for Nocterm-specific workflows.
+## Installation
 
-## Features
-
-**19 productivity assists** organized into four categories:
-
-### Component Manipulation (5)
-- **Move Up/Down** — Reorder components up or down in the tree
-- **Swap with Child** — Exchange positions with immediate child
-- **Swap with Parent** — Exchange positions with parent component  
-- **Remove Component** — Delete wrapper while preserving children
-
-### Component Wrapping (10)
-- **Wrap with Component** — Choose from available component types
-- **Wrap with Generic** — Container with customizable child
-- **Wrap with Center** — Center-align component
-- **Wrap with Container** — Add styling container
-- **Wrap with Padding** — Add spacing (default: 8dp)
-- **Wrap with Row/Column** — Create horizontal/vertical layouts
-- **Wrap with Expanded/Flexible** — Control sizing in flex contexts
-- **Wrap with SizedBox** — Define explicit dimensions
-
-### Layout Builders (2)
-- **Wrap with Builder** — Builder pattern wrapper
-- **Wrap with ValueListenableBuilder** — Reactive state pattern
-
-### Component Conversion (2)
-- **Convert to Stateful** — Refactor to StatefulComponent
-- **Convert to Stateless** — Refactor to StatelessComponent
-
-## Getting Started
-
-### For Development (Local Path)
-
-Add to your project's `analysis_options.yaml`:
+### Use from local path (development)
 
 ```yaml
 include: package:nocterm_lints/recommended.yaml
@@ -58,157 +25,91 @@ plugins:
     path: ../path/to/nocterm_lints
 ```
 
-### For Published Package
+### Use from pub package
 
 ```yaml
 include: package:nocterm_lints/recommended.yaml
 
 plugins:
-  nocterm_lints: ^0.1.0
+  nocterm_lints: ^0.3.0
 ```
 
-### Activate Assists
+After updating `analysis_options.yaml`, restart the Dart Analysis Server.
 
-After updating `analysis_options.yaml`, restart the Dart Analysis Server:
+## All Assistants
 
-| Editor | Command |
-|--------|---------|
-| **VS Code** | `Cmd+Shift+P` → "Dart: Restart Analysis Server" |
-| **IntelliJ / Android Studio** | Tools → Dart Analysis → Restart |
+The table below lists every registered assistant in this project.
 
-> [!tip]
-> Use `Cmd+.` (macOS) or `Ctrl+.` (Windows/Linux) to see available assists when the cursor is on a component.
+| Category | Assistant | Code Action label | Description |
+| --- | --- | --- | --- |
+| Move | `MoveUp` | `Move component up` | Swaps the selected component with the previous sibling in a list. |
+| Move | `MoveDown` | `Move component down` | Swaps the selected component with the next sibling in a list. |
+| Swap | `SwapWithChild` | `Swap with child` | Swaps a parent component with its direct child when structure is valid. |
+| Swap | `SwapWithParent` | `Swap with parent` | Swaps a child component with its direct parent when structure is valid. |
+| Remove | `RemoveWidget` | `Remove this component` | Removes a wrapper and preserves valid `child` or `children` content when possible. |
+| Wrap | `WrapComponent` | `Wrap with component...` | Wraps a selected list of components with a generic component wrapper. |
+| Wrap | `WrapGeneric` | `Wrap with component...` | Wraps a single component with a generic configurable wrapper. |
+| Wrap | `WrapCenter` | `Wrap with Center` | Wraps the selected component in `Center`. |
+| Wrap | `WrapContainer` | `Wrap with Container` | Wraps the selected component in `Container`. |
+| Wrap | `WrapExpanded` | `Wrap with Expanded` | Wraps the selected component in `Expanded` in compatible flex contexts. |
+| Wrap | `WrapFlexible` | `Wrap with Flexible` | Wraps the selected component in `Flexible` in compatible flex contexts. |
+| Wrap | `WrapPadding` | `Wrap with Padding` | Wraps the selected component in `Padding` with default edge insets. |
+| Wrap | `WrapSizedBox` | `Wrap with SizedBox` | Wraps the selected component in `SizedBox`. |
+| Wrap | `WrapRow` | `Wrap with Row` | Wraps selected component(s) in a `Row(children: [...])`. |
+| Wrap | `WrapColumn` | `Wrap with Column` | Wraps selected component(s) in a `Column(children: [...])`. |
+| Wrap | `WrapBuilder` | `Wrap with Builder` | Wraps the selected component in `Builder` and generates a builder closure. |
+| Wrap | `WrapValueListenableBuilder` | `Wrap with ValueListenableBuilder` | Wraps the selected component in `ValueListenableBuilder`. |
+| Convert | `ConvertToStatefulComponent` | `Convert to StatefulComponent` | Refactors a stateless component into StatefulComponent + State classes. |
+| Convert | `ConvertToStatelessComponent` | `Convert to StatelessComponent` | Refactors eligible stateful component/state pair into a stateless component. |
 
-## Usage Examples
+## Usage
 
-### Wrap with Padding
+1. Place the cursor on, or inside, a Nocterm component expression.
+2. Open code actions (`Cmd+.` on macOS, `Ctrl+.` on Windows/Linux).
+3. Pick an assist from the list.
 
-**Before:**
+> [!TIP]
+> If assists do not appear after install/config changes, run `Dart: Restart Analysis Server`.
+
+## Example
+
+Before:
+
 ```dart
-final component = MyComponent(child: Text('Hello'));
+return Text('hello');
 ```
 
-**After:** Invoke "Wrap with Padding" assist
+After `Wrap with Padding`:
+
 ```dart
-final component = Padding(
+return Padding(
   padding: const EdgeInsets.all(8),
-  child: MyComponent(child: Text('Hello')),
+  child: Text('hello'),
 );
-```
-
-### Convert to Stateless Component
-
-**Before:**
-```dart
-class MyComponent extends StatefulComponent {
-  @override
-  State<MyComponent> createState() => _MyComponentState();
-}
-
-class _MyComponentState extends State<MyComponent> {
-  @override
-  Component build(BuildContext context) => Text('Hello');
-}
-```
-
-**After:** Invoke "Convert to Stateless Component" assist
-```dart
-class MyComponent extends StatelessComponent {
-  const MyComponent({super.key});
-
-  @override
-  Component build(BuildContext context) => Text('Hello');
-}
-```
-
-## Configuration
-
-Enable or disable diagnostics in `analysis_options.yaml`:
-
-```yaml
-plugins:
-  nocterm_lints:
-    path: ../nocterm_lints
 ```
 
 ## Development
 
-### Setup
-
-Bootstrap dependencies:
 ```bash
 dart pub get
-```
-
-### Run Tests
-
-```bash
-dart test
-```
-
-### Format Code
-
-```bash
-dart format .
-```
-
-### Analyze
-
-```bash
 dart analyze
+dart test test/assistants
 ```
 
-### Test Against Local Project
+## Project Layout
 
-1. Add to test project's `analysis_options.yaml`:
-   ```yaml
-   plugins:
-     nocterm_lints:
-       path: /path/to/nocterm_lints
-   ```
-
-2. Restart the Dart Analysis Server
-
-## Project Structure
-
-```
-nocterm_lints/
-├── lib/
-│   ├── main.dart                 # Plugin entry point
-│   ├── src/assistants/            # Individual assists
-│   │   ├── wrap_*.dart
-│   │   ├── move_*.dart
-│   │   ├── convert_*.dart
-│   │   └── ...
-│   ├── services/                 # Core services
-│   └── utilities/                # Shared extensions
-├── test/                         # Unit tests
-├── example/                      # Example project
-├── analysis_options.yaml
-├── pubspec.yaml
-└── recommended.yaml              # Default lint config
+```text
+lib/
+  main.dart
+  assistants/
+  services/
+  utilities/
+test/
+  assistants/
+example/
 ```
 
-## Requirements
-
-| Requirement | Version |
-|-------------|---------|
-| Dart SDK | >= 3.10.0 |
-| analysis_server_plugin | ^0.3.4 |
-| analyzer | >= 8.0.0, < 10.0.0 |
-
-## Supported Editors
-
-- VS Code (via Dart extension)
-- IntelliJ IDEA
-- Android Studio
-- Other Dart analyzer-compatible editors
-
-## Licensing
-
-Dual-licensed for compatibility:
-
-- **New code**: [MIT License](LICENSE)
-- **Derived from Dart SDK**: [BSD-3-Clause License](https://github.com/dart-lang/sdk/blob/main/LICENSE)
-
-See [ACKNOWLEDGMENTS.md](ACKNOWLEDGMENTS.md) and [LICENSE](LICENSE) for detailed attribution.
+[logo_black]: https://raw.githubusercontent.com/zoocityboy/zoo_brand/main/styles/README/zoocityboy_dark.png#gh-light-mode-only
+[logo_white]: https://raw.githubusercontent.com/zoocityboy/zoo_brand/main/styles/README/zoocityboy_light.png#gh-dark-mode-only
+[zoocityboy_link_dark]: https://github.com/zoocityboy#gh-dark-mode-only
+[zoocityboy_link_light]: https://github.com/zoocityboy#gh-light-mode-only
