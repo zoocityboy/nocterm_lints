@@ -1,3 +1,51 @@
+:robot: I have created a release *beep* *boop*
+---
+
+
+## [0.4.0](https://github.com/zoocityboy/nocterm_lints/compare/nocterm_lints-v0.3.0-beta.3...nocterm_lints-v0.4.0) (2026-02-22)
+
+
+### Features
+
+* add CI workflow for linting, formatting, and testing ([6be906e](https://github.com/zoocityboy/nocterm_lints/commit/6be906ef30526658e6297b5abde383b845fa791b))
+* add CI/CD release workflow and configuration files for automated versioning and changelog updates ([187f765](https://github.com/zoocityboy/nocterm_lints/commit/187f765bc48fa3f9340e45d26cc4057eceb728d4))
+* Add extensions for Dart elements and Nocterm components ([98d11c7](https://github.com/zoocityboy/nocterm_lints/commit/98d11c73cc1cadd7069590a0def76474eddfbc2b))
+* add launch configuration and implement tests for component conversion assists ([86afcd1](https://github.com/zoocityboy/nocterm_lints/commit/86afcd14423c06ba2379b01eb110a0a924b91077))
+* add pre-commit and pre-push hooks for linting and testing, update dependencies ([c8a2e02](https://github.com/zoocityboy/nocterm_lints/commit/c8a2e025dfd3b282570af5dbc6803372f382f81d))
+* add support for optional semver override in release workflow ([3aead02](https://github.com/zoocityboy/nocterm_lints/commit/3aead028f73367f4298d41cc535002f512d01410))
+* add support for optional semver override in release workflow ([9fb981f](https://github.com/zoocityboy/nocterm_lints/commit/9fb981f1aac4adf6a5618796bf58550968c93a18))
+* add utility extensions for AST, elements, and string manipulation ([7c2cd1b](https://github.com/zoocityboy/nocterm_lints/commit/7c2cd1b677fc3421a469c2d072898103768f270d))
+* clean up imports and comment out unused variable in Nocterm files ([fd8be6c](https://github.com/zoocityboy/nocterm_lints/commit/fd8be6c5453263e0cbd7d05257298293fe0b37ce))
+* enhance analysis options and improve logging messages ([0252923](https://github.com/zoocityboy/nocterm_lints/commit/02529231dc8c16652943e07d04eb233cab72e799))
+* ignore experimental_member_use error in analysis options ([9d11ae6](https://github.com/zoocityboy/nocterm_lints/commit/9d11ae66127ba68ebe70c5622d1c05f3be0cc150))
+* initial commit of nocterm_lints plugin with assists and lints ([26d1a10](https://github.com/zoocityboy/nocterm_lints/commit/26d1a10981ef9255fc71d98a926c4bd2c32c2135))
+* **logger:** add method to create logger instance with file in app directory ([5fcb05c](https://github.com/zoocityboy/nocterm_lints/commit/5fcb05cacf8f141494c10ab7572e9ac82690a50f))
+* **logging:** integrate NoctermLogger for enhanced logging capabilities ([cf6e927](https://github.com/zoocityboy/nocterm_lints/commit/cf6e9270a84702263cbb86a572a0f4686fc1fe12))
+* refactor assist kinds and add session helper extension for Nocterm ([babff98](https://github.com/zoocityboy/nocterm_lints/commit/babff983c4482a1a1aeb8a5c1cda48444510a9b9))
+* Refactor assistant filenames and update documentation for migration ([8da5ec9](https://github.com/zoocityboy/nocterm_lints/commit/8da5ec91ca9d17feba8d04510a6d4ef92603ba26))
+* remove unused imports from multiple Nocterm files ([4edf41d](https://github.com/zoocityboy/nocterm_lints/commit/4edf41d460cd3d1d398d5c3d0fa7356244a6de42))
+* rename assist kinds for stateful and stateless widget conversions ([856b10b](https://github.com/zoocityboy/nocterm_lints/commit/856b10b30cb5ec3b48b0406f0ff231229836ecef))
+* update analysis options and add Nocterm component snippets ([352ea8f](https://github.com/zoocityboy/nocterm_lints/commit/352ea8f1146a99093ab2a09bdce73d6f2da0e1a3))
+* update analysis options and add recommended lints configuration ([f205fb1](https://github.com/zoocityboy/nocterm_lints/commit/f205fb1878fd0cc6ac32978aa98a146a4d2fd3b7))
+* update assist kind description and remove unused wrap stream builder ([01e1eb9](https://github.com/zoocityboy/nocterm_lints/commit/01e1eb9c52873e032a1d652f8a24a52af4ad55fd))
+* update import statement for token package in NoctermConvertToStatelessWidget ([2bea628](https://github.com/zoocityboy/nocterm_lints/commit/2bea6288c73b392022f299a617a9585a7e2ed130))
+* update import statement for token package in NoctermConvertToStatelessWidget ([4d5eda3](https://github.com/zoocityboy/nocterm_lints/commit/4d5eda37e58ae11d9163e06b32221815c2f8fba3))
+* update version to 0.2.0-dev.1 and enhance project documentation ([16b3bf8](https://github.com/zoocityboy/nocterm_lints/commit/16b3bf8798f9f6c65baefa084e594d8d2df9abeb))
+* update version to 0.2.0-dev.2 and fix typo in CHANGELOG ([914f768](https://github.com/zoocityboy/nocterm_lints/commit/914f768c97d5f10d7d75f3cdda88dc7e73fc9dde))
+* update version to 0.3.0+beta.1 and correct tag format in CHANGELOG ([8c0bc91](https://github.com/zoocityboy/nocterm_lints/commit/8c0bc91e422ba0fca4faf498b5db8209351bcf30))
+* update version to 0.3.0+beta.2 in pubspec.yaml ([522bfcf](https://github.com/zoocityboy/nocterm_lints/commit/522bfcf3f12c86e4e711fb07fb35901b9a5bc1d4))
+* update version to 0.3.0+dev.1 and fix tag format in CHANGELOG ([d054448](https://github.com/zoocityboy/nocterm_lints/commit/d054448b593111ad4ce6840a469a65355898a45a))
+
+
+### Bug Fixes
+
+* disable logging in NoctermLintsPlugin startup ([3865536](https://github.com/zoocityboy/nocterm_lints/commit/386553638108684e637328eb8b538ad0e0b364cc))
+* update versioning format to use hyphen for beta releases ([20e23e0](https://github.com/zoocityboy/nocterm_lints/commit/20e23e0bf8e3a0a9b880cbd951317bb3ab056bd4))
+* update versioning format to use hyphen for beta releases ([250b5b3](https://github.com/zoocityboy/nocterm_lints/commit/250b5b37f501ebbe1d80a2e1bce7c5dec8ad8e39))
+
+---
+This PR was generated with [Release Please](https://github.com/googleapis/release-please). See [documentation](https://github.com/googleapis/release-please#release-please).
+
 # 0.3.0-beta.3
 - **refactor**: simplified assist registration and structure
   - Consolidated producer implementations for improved maintainability
