@@ -1,8 +1,9 @@
 name: nocterm_lints
-description: Nocterm lints add Assistants to the editor.
+description: >- 
+  Set of Assists for Nocterm development, you can use same DX as you do with Flutter, but in Nocterm projects.
 version: 0.5.0
 repository: https://github.com/zoocityboy/nocterm_lints
-homepage: https://zoocityboy.github.io/nocterm_lints
+homepage: https://github.com/zoocityboy/nocterm_lints
 issue_tracker: https://github.com/zoocityboy/nocterm_lints/issues
 topics:
   - linter
