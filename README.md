@@ -31,7 +31,7 @@ plugins:
 include: package:nocterm_lints/recommended.yaml
 
 plugins:
-  nocterm_lints: ^0.3.0
+  nocterm_lints: ^0.4.0
 ```
 
 After updating `analysis_options.yaml`, restart the Dart Analysis Server.
