@@ -5,6 +5,11 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      release_as:
+        description: 'Optional semver override for the next release (maps to release-as)'
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -20,8 +25,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Run release automation
+        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.release_as == '' }}
         uses: googleapis/release-please-action@v4
         with:
           token: ${{ secrets.GH_TOKEN }}
           config-file: .release-please-config.json
           manifest-file: .release-please-manifest.json
+
+      - name: Run release automation (release-as override)
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.release_as != '' }}
+        uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          config-file: .release-please-config.json
+          manifest-file: .release-please-manifest.json
+          release-as: ${{ github.event.inputs.release_as }}
