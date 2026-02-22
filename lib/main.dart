@@ -32,7 +32,7 @@ class NoctermLintsPlugin extends Plugin {
   @override
   FutureOr<void> start() {
     final logger = NoctermLogger.instance;
-    logger.setEnabled(true);
+    logger.setEnabled(false);
     logger.setLogLevel(LogLevel.info);
     logger.clear();
     logger.info('NoctermLintsPlugin starting');

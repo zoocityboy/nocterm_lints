@@ -5,6 +5,7 @@
   "prerelease-type": "beta",
   "include-v-in-tag": true,
   "pull-request-title-pattern": "chore(main): release ${version}",
+  "draft-pull-request": true,
   "packages": {
     ".": {
       "component": "nocterm_lints",
