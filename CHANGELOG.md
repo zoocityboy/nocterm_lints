@@ -1,4 +1,4 @@
-# 0.3.0+beta.3
+# 0.3.0-beta.3
 - **refactor**: simplified assist registration and structure
   - Consolidated producer implementations for improved maintainability
   - Updated registration pattern in `lib/main.dart`
@@ -14,7 +14,7 @@
 - **chore**: code cleanup
   - Removed obsolete files and imports
 
-# 0.3.0+beta.2
+# 0.3.0-beta.2
 
 - **refactor**: removed `Nocterm` prefix from assistant filenames and exported class names
   - Renamed assistant files under `lib/src/assistants/` to drop the `nocterm_` prefix (for example
@@ -37,7 +37,7 @@
   - Run `dart analyze` and `dart test` locally; after the mass rename some environment-specific imports or plugin AOT compilation may need minor fixes.
 
 
-# 0.3.0+beta.1
+# 0.3.0-beta.1
   
 - **chore**: wrong format of tag versions
 
