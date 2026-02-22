@@ -19,6 +19,7 @@ analyzer:
     avoid_catches_without_on_clauses: ignore
     dangling_library_doc_comments: ignore
     no_runtimetype_tostring: ignore
+    lines_longer_than_80_chars: ignore
 
   exclude:
     - test/.test_coverage.dart

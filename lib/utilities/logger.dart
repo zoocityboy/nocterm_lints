@@ -59,8 +59,8 @@ class NoctermLogger {
   static NoctermLogger get instance => _instance ??= _createInstance();
 
   late final File _logFile;
-  late LogLevel _logLevel;
-  late bool _enabled;
+  LogLevel _logLevel = LogLevel.error;
+  bool _enabled = false;
   final List<String> _buffer = [];
   static const int _bufferSize = 1;
 

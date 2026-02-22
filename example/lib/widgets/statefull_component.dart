@@ -1,17 +1,15 @@
 import 'package:nocterm/nocterm.dart';
 
-class StatefulComponentX extends StatefulComponent {
+class MyComponent extends StatefulComponent {
   @override
-  State<StatefulComponentX> createState() => _StatefulComponentXState();
+  State<MyComponent> createState() => _MyComponentState();
 }
 
-class _StatefulComponentXState extends State<StatefulComponentX>
+class _MyComponentState extends State<MyComponent>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   @override
   void initState() {
-    // TODO: implement initState
-
     super.initState();
     _controller = AnimationController(
       vsync: this,
@@ -29,5 +27,19 @@ class _StatefulComponentXState extends State<StatefulComponentX>
         );
       },
     );
+  }
+}
+
+class MyWidget extends StatefulComponent {
+  const MyWidget({super.key});
+
+  @override
+  State<MyWidget> createState() => _MyWidgetState();
+}
+
+class _MyWidgetState extends State<MyWidget> {
+  @override
+  Component build(BuildContext context) {
+    return const SizedBox.shrink();
   }
 }

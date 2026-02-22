@@ -91,17 +91,17 @@ abstract final class DartAssistKind {
   static const noctermMoveDown = AssistKind(
     'dart.assist.nocterm.move.down',
     DartAssistKindPriority.noctermMove,
-    'Move widget down',
+    'Move component down',
   );
   static const noctermMoveUp = AssistKind(
     'dart.assist.nocterm.move.up',
     DartAssistKindPriority.noctermMove,
-    'Move widget up',
+    'Move component up',
   );
   static const noctermRemoveWidget = AssistKind(
     'dart.assist.nocterm.removeWidget',
     DartAssistKindPriority.noctermRemove,
-    'Remove this widget',
+    'Remove this component',
   );
 }
 
