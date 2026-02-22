@@ -24,6 +24,24 @@ jobs:
     name: Conventional Commit Release
     runs-on: ubuntu-latest
     steps:
+      - name: Guard required release token
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          if [ -z "${GH_TOKEN}" ]; then
+            echo "::error::Missing required secret GH_TOKEN. Add a repository secret named GH_TOKEN with repo write permissions."
+            exit 1
+          fi
+
+          if ! curl --silent --fail --show-error \
+            --header "Authorization: Bearer ${GH_TOKEN}" \
+            --header "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}" > /dev/null; then
+            echo "::error::GH_TOKEN is present but cannot access repository API. Verify token scope/permissions."
+            exit 1
+          fi
+
       - name: Run release automation
         if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.release_as == '' }}
         uses: googleapis/release-please-action@v4
