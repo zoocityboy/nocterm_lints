@@ -1,29 +1,19 @@
-MIT License with BSD-3-Clause Derivative Works
+Nocterm Lints Dual License (OSI-approved)
 
-This project is dual-licensed:
+SPDX-License-Identifier: MIT AND BSD-3-Clause
 
-## Original Derivative Works (BSD-3-Clause)
+This repository is dual-licensed under the OSI-approved MIT and BSD 3-Clause
+licenses.
 
-Portions of this software are derived from the Dart project and retain their
-original BSD-3-Clause license:
+- Dart-derived source code remains under BSD 3-Clause terms.
+- Original and modified project code is available under MIT terms.
 
-```
-Copyright (c) 2020, the Dart project authors. All rights reserved.
-Use of this source code is governed by a BSD-style license that can be found
-in the LICENSE.dart file distributed with the Dart SDK:
-https://github.com/dart-lang/sdk/blob/main/LICENSE
-```
+For attribution and provenance details, see ACKNOWLEDGMENTS.md.
 
-The following files are derived from the Dart project with modifications:
-- lib/nocterm/* (Dart assists adapted for Nocterm)
-- lib/utilities/extensions/ast.dart
-- lib/utilities/extensions/element.dart
+-------------------------------------------------------------------------------
+MIT License
+-------------------------------------------------------------------------------
 
-## Original and Modified Works (MIT License)
-
-All other code, including modifications to derived files and new implementations:
-
-```
 Copyright (c) 2026 zoocityboy
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -43,11 +33,35 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-```
 
-## Compliance
+-------------------------------------------------------------------------------
+BSD 3-Clause License
+-------------------------------------------------------------------------------
 
-This dual licensing ensures compliance with both:
-- The MIT License for new original works
-- The BSD-3-Clause License for derived Dart project code
-- The Dart SDK's license requirements
+Copyright (c) 2020, the Dart project authors.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+	list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+	this list of conditions and the following disclaimer in the documentation
+	and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+	contributors may be used to endorse or promote products derived from
+	this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
